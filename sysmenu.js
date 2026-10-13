@@ -27,7 +27,8 @@
     { id: 'saraban', name: 'งานสารบรรณ', tone: 'indigo' },
     { id: 'teach', name: 'งานครูและการเรียนการสอน', tone: 'teal' },
     { id: 'admit', name: 'งานรับนักเรียน', tone: 'amber' },
-    { id: 'account', name: 'บัญชีผู้ใช้', tone: 'slate' }
+    { id: 'account', name: 'บัญชีผู้ใช้', tone: 'slate' },
+    { id: 'request', name: 'พัฒนาระบบ', tone: 'slate' }
   ];
   var SYSTEMS = [
     { id: 'doc', group: 'saraban', icon: 'bi-envelope-paper', name: 'ระบบรับหนังสือราชการ', desc: 'รับหนังสือ เสนอ สั่งการ', url: 'https://pcschool-dev.github.io/doc/' },
@@ -37,7 +38,8 @@
     { id: 'homework', group: 'teach', icon: 'bi-journal-text', name: 'ระบบส่งการบ้านนักเรียน', desc: 'สั่งงาน รับงาน ตรวจงานออนไลน์', url: 'https://pcschool-dev.github.io/homework/' },
     { id: 'regpc', group: 'admit', icon: 'bi-mortarboard', name: 'ระบบรับสมัครนักเรียน', desc: 'สมัครเรียน ยืนยันสิทธิ์ รายงานตัว', url: 'https://pcschool-dev.github.io/regpc' },
     { id: 'admin', group: 'admit', icon: 'bi-people', name: 'ระบบจัดการรับสมัครนักเรียน', desc: 'สำหรับเจ้าหน้าที่รับสมัคร', url: 'https://pcschool-dev.github.io/admin/' },
-    { id: 'account', group: 'account', icon: 'bi-person-circle', name: 'บัญชีผู้ใช้ โรงเรียนปากช่อง', desc: 'บัญชีเดียว เข้าได้ทุกระบบ', url: 'https://pcschool-dev.github.io/account' }
+    { id: 'account', group: 'account', icon: 'bi-person-circle', name: 'บัญชีผู้ใช้ โรงเรียนปากช่อง', desc: 'บัญชีเดียว เข้าได้ทุกระบบ', url: 'https://pcschool-dev.github.io/account'},
+    { id: 'dsds', group: 'request', icon: 'bi-person-circle', name: 'ระบบขอพัฒนาเว็บแอป', desc: 'ระบบแจ้งความประสงค์ขอพัฒนาเว็บแอป', url: 'https://script.google.com/a/macros/pcschool.ac.th/s/AKfycbyK4gl3CxqnsRSB2FdYPJo7Nv2jQe5L_7ObjIkjfk-dxOzlRj8-lwtZFq-FCBRQFB_-Og/exec' }
   ];
   var REQUEST = { icon: 'bi-lightbulb', name: 'ขอพัฒนาเว็บแอปใช้งาน', desc: 'มีงานที่อยากให้เป็นระบบออนไลน์? แจ้งทีม DSDS',
     url: 'https://script.google.com/macros/s/AKfycbyK4gl3CxqnsRSB2FdYPJo7Nv2jQe5L_7ObjIkjfk-dxOzlRj8-lwtZFq-FCBRQFB_-Og/exec' };
