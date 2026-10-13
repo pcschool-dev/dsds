@@ -40,7 +40,7 @@
     { id: 'account', group: 'account', icon: 'bi-person-circle', name: 'บัญชีผู้ใช้ โรงเรียนปากช่อง', desc: 'บัญชีเดียว เข้าได้ทุกระบบ', url: 'https://pcschool-dev.github.io/account'}
      ];
   var REQUEST = { icon: 'bi-lightbulb', name: 'ขอพัฒนาเว็บแอปใช้งาน', desc: 'มีงานที่อยากให้เป็นระบบออนไลน์? แจ้งทีม DSDS',
-    url: 'https://script.google.com/macros/s/AKfycbyK4gl3CxqnsRSB2FdYPJo7Nv2jQe5L_7ObjIkjfk-dxOzlRj8-lwtZFq-FCBRQFB_-Og/exec' };
+    url: 'https://script.google.com/a/macros/pcschool.ac.th/s/AKfycbyK4gl3CxqnsRSB2FdYPJo7Nv2jQe5L_7ObjIkjfk-dxOzlRj8-lwtZFq-FCBRQFB_-Og/exec' };
   var LOGO = 'https://lh5.googleusercontent.com/d/1Q28ttbihnvUUF-kEBwdEj04kVyQ8h0n-';
   var ICONS_CSS = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
 
