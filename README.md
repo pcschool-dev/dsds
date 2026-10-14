@@ -9,5 +9,8 @@
 - `data-fab` ปุ่มลอยเมื่อหน้าไม่มีปุ่มของตัวเอง: top-right (ค่าเริ่มต้น) | top-left | bottom-right | bottom-left | off
 - ปุ่มของระบบเอง: ใส่ `data-sysmenu` ที่ปุ่ม
 
-**เพิ่ม/แก้ระบบ:** แก้ `SYSTEMS` ใน `sysmenu.js` แล้ว push — ทุกระบบเห็นภายใน ~10 นาที ไม่ต้อง deploy Apps Script
+- `data-admin="1"` หรือ `DSDSMenu.setAdmin(true)` แสดงลิงก์ "จัดการรายการระบบ" ท้ายแผง
+
+**เพิ่ม/แก้ระบบ:** แก้ใน Google Sheet "รายการระบบ DSDS" (https://docs.google.com/spreadsheets/d/1MjY_5Uvw2Mgyb2ejG5sBb-mBnqaCJ79xVwI9s7aN5XA/edit) — ผู้ใช้เห็นภายในไม่กี่นาที
+ชีตต้องเปิด "ทุกคนที่มีลิงก์ดูได้" ; สิทธิ์แก้ = คนที่ได้รับแชร์เป็นผู้แก้ไข ; อ่านชีตไม่ได้ -> ใช้รายการสำรอง `SYSTEMS` ใน `sysmenu.js`
 **ระวัง:** ไฟล์นี้ทำงานในทุกระบบของโรงเรียน ให้สิทธิ์แก้ repo เฉพาะทีม DSDS
