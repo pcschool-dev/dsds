@@ -141,6 +141,42 @@
     '.dsm-fab.top-left { top: calc(12px + env(safe-area-inset-top, 0px)); left: 12px; }',
     '.dsm-fab.bottom-right { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px; }',
     '.dsm-fab.bottom-left { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 16px; }',
+    // โหมดมืด/ถนอมสายตา ตามหน้าเว็บ: ระบบที่มีโหมดตั้ง data-theme (หรือ data-bs-theme ของ Bootstrap) ที่ <html>
+    // ไม่ใช้ prefers-color-scheme ตรง ๆ — ระบบที่ยังไม่มีโหมดมืดจะได้แผงมืดบนหน้าสว่าง
+    'html[data-theme="dark"] .dsm-scrim, html[data-bs-theme="dark"] .dsm-scrim { background: rgba(0,0,0,.6); }',
+    'html[data-theme="dark"] .dsm-panel, html[data-bs-theme="dark"] .dsm-panel { background: #10151e; color: #e6ebf3; box-shadow: -16px 0 40px rgba(0,0,0,.55); }',
+    'html[data-theme="dark"] .dsm-sec, html[data-bs-theme="dark"] .dsm-sec { color: #9aa6b8; }',
+    'html[data-theme="dark"] .dsm-group, html[data-bs-theme="dark"] .dsm-group { background: #1b212b; border-color: #2a3240; box-shadow: none; }',
+    'html[data-theme="dark"] .dsm-item, html[data-theme="dark"] .dsm-req, html[data-bs-theme="dark"] .dsm-item, html[data-bs-theme="dark"] .dsm-req { color: #e6ebf3 !important; }',
+    'html[data-theme="dark"] .dsm-item + .dsm-item, html[data-bs-theme="dark"] .dsm-item + .dsm-item { border-top-color: #262d39; }',
+    'html[data-theme="dark"] a.dsm-item:hover, html[data-theme="dark"] a.dsm-item:focus-visible, html[data-bs-theme="dark"] a.dsm-item:hover, html[data-bs-theme="dark"] a.dsm-item:focus-visible { background: #222a36; }',
+    'html[data-theme="dark"] .dsm-indigo, html[data-bs-theme="dark"] .dsm-indigo { --dsm-bg: #262b4a; --dsm-fg: #a5b4fc; }',
+    'html[data-theme="dark"] .dsm-teal, html[data-bs-theme="dark"] .dsm-teal { --dsm-bg: #173430; --dsm-fg: #5eead4; }',
+    'html[data-theme="dark"] .dsm-amber, html[data-bs-theme="dark"] .dsm-amber { --dsm-bg: #3a2c14; --dsm-fg: #fcd34d; }',
+    'html[data-theme="dark"] .dsm-slate, html[data-bs-theme="dark"] .dsm-slate { --dsm-bg: #262d39; --dsm-fg: #cbd5e1; }',
+    'html[data-theme="dark"] .dsm-pink, html[data-bs-theme="dark"] .dsm-pink { --dsm-bg: #3a1b2b; --dsm-fg: #f9a8d4; }',
+    'html[data-theme="dark"] .dsm-sky, html[data-bs-theme="dark"] .dsm-sky { --dsm-bg: #13304a; --dsm-fg: #7dd3fc; }',
+    'html[data-theme="dark"] .dsm-soon, html[data-bs-theme="dark"] .dsm-soon { color: #fcd34d; background: #3a2c14; }',
+    'html[data-theme="dark"] .dsm-tx small, html[data-bs-theme="dark"] .dsm-tx small { color: #9aa6b8; }',
+    'html[data-theme="dark"] .dsm-go, html[data-bs-theme="dark"] .dsm-go { color: #5b6678; }',
+    'html[data-theme="dark"] a.dsm-item:hover .dsm-go, html[data-theme="dark"] .dsm-admin, html[data-theme="dark"] .dsm-here, html[data-bs-theme="dark"] a.dsm-item:hover .dsm-go, html[data-bs-theme="dark"] .dsm-admin, html[data-bs-theme="dark"] .dsm-here { color: #a5b4fc !important; }',
+    'html[data-theme="dark"] .dsm-item.is-current, html[data-bs-theme="dark"] .dsm-item.is-current { background: linear-gradient(90deg, #232a3d, #1b212b); }',
+    'html[data-theme="dark"] .dsm-here, html[data-bs-theme="dark"] .dsm-here { background: transparent; }',
+    'html[data-theme="dark"] .dsm-req, html[data-bs-theme="dark"] .dsm-req { border-color: #4a3a1a; background: linear-gradient(135deg, #2a2214, #221c12); }',
+    'html[data-theme="dark"] .dsm-req:hover, html[data-bs-theme="dark"] .dsm-req:hover { border-color: #a16207; box-shadow: none; }',
+    'html[data-theme="dark"] .dsm-req .dsm-ic, html[data-bs-theme="dark"] .dsm-req .dsm-ic { --dsm-bg: #4a3a1a; --dsm-fg: #fcd34d; }',
+    'html[data-theme="dark"] .dsm-req:hover .dsm-go, html[data-bs-theme="dark"] .dsm-req:hover .dsm-go { color: #fcd34d; }',
+    'html[data-theme="dark"] .dsm-foot, html[data-bs-theme="dark"] .dsm-foot { background: #1b212b; border-top-color: #2a3240; color: #7f8da1; }',
+    'html[data-theme="warm"] .dsm-panel { background: #ede6d8; color: #2f281f; }',
+    'html[data-theme="warm"] .dsm-sec { color: #7a6e5f; }',
+    'html[data-theme="warm"] .dsm-group { background: #f9f3e8; border-color: #e5dccb; }',
+    'html[data-theme="warm"] .dsm-item, html[data-theme="warm"] .dsm-req { color: #2f281f !important; }',
+    'html[data-theme="warm"] .dsm-item + .dsm-item { border-top-color: #ece3d3; }',
+    'html[data-theme="warm"] a.dsm-item:hover, html[data-theme="warm"] a.dsm-item:focus-visible { background: #f2ebde; }',
+    'html[data-theme="warm"] .dsm-tx small { color: #7a6e5f; }',
+    'html[data-theme="warm"] .dsm-item.is-current { background: linear-gradient(90deg, #efe7d8, #f9f3e8); }',
+    'html[data-theme="warm"] .dsm-here { background: #f9f3e8; }',
+    'html[data-theme="warm"] .dsm-foot { background: #f9f3e8; border-top-color: #e5dccb; color: #8f8372; }',
     '@media print { .dsm-root, .dsm-fab, [data-sysmenu] { display: none !important; } }'
   ].join('\n');
 
@@ -337,7 +373,7 @@
   window.DSDSMenu = {
     open: function () { open(); }, close: close, refresh: function () { refresh(true); },
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
-    get systems() { return DATA.systems.slice(); }, version: '1.1.1'
+    get systems() { return DATA.systems.slice(); }, version: '1.2.0'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
