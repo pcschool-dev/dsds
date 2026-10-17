@@ -34,7 +34,7 @@
   var force = '';
   try { force = new URLSearchParams(location.search).get('fbgate') || ''; } catch (e) { }
   var inApp = /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Instagram|Messenger/i.test(ua) || !!force;
-  window.DSDSFbGate = { blocked: inApp, version: '1.0.0' };
+  window.DSDSFbGate = { blocked: inApp, version: '1.1.0' };
   if (!inApp) return;
 
   var isAndroid = force ? force === 'android' : /Android/i.test(ua);
@@ -51,6 +51,9 @@
 
   var ACC = opt('accent') || '#4338ca';
   var GRAD = opt('grad') || 'linear-gradient(135deg,#312e81 0%,#4338ca 55%,#6366f1 100%)';
+  // iPhone: ปุ่มเปิดใน Chrome อีกทาง (googlechromes:// = แอป Chrome ; ไม่มีในเครื่อง = กดแล้วไม่เกิดอะไร ยังมีปุ่ม Safari)
+  var chromeUrl = isAndroid ? '' : 'googlechromes://' + url.host + url.pathname + url.search + url.hash;
+
   var CSS = '' +
     'html.dsds-fb,html.dsds-fb body{overflow:hidden!important;height:100%!important;margin:0!important}' +
     'html.dsds-fb body>*:not(#dsds-fbgate){display:none!important}' +
@@ -74,6 +77,8 @@
       'text-decoration:none;-webkit-tap-highlight-color:transparent;transition:transform .12s,box-shadow .12s}' +
     '#dsds-fbgate .btn:active{transform:scale(.98)}' +
     '#dsds-fbgate .p{padding:14px;background:var(--acc);color:#fff;font-weight:700;font-size:17px;box-shadow:0 10px 22px -10px var(--acc)}' +
+    '#dsds-fbgate .c{margin-top:10px;padding:12px;background:#eef2ff;color:var(--acc);border:1.5px solid #c7d2fe;font-weight:700;font-size:16px}' +
+    '#dsds-fbgate .c small{font-weight:400;color:#64748b;font-size:13px}' +
     '#dsds-fbgate .s{margin-top:10px;padding:12px;background:#fff;color:#334155;border:1.5px solid #e2e8f0;font-weight:600;font-size:15px}' +
     '#dsds-fbgate .s.ok{border-color:#86efac;background:#f0fdf4;color:#15803d}' +
     '#dsds-fbgate .or{display:flex;align-items:center;gap:10px;color:#94a3b8;font-size:13px;margin:20px 0 12px}' +
@@ -93,6 +98,7 @@
     ext: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M19 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4"/></svg>',
     warn: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
     compass: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.3-6.3 2.1 2.1-6.3z"/></svg>',
+    chrome: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M21.17 8H12"/><path d="M3.95 6.06 8.54 14"/><path d="M10.88 21.94 15.46 14"/></svg>',
     copy: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
     check: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
     play: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'
@@ -118,8 +124,9 @@
         '<div class="ic">' + SVG.ext + '</div>' +
         '<h1>โปรดเปิดด้วยเบราว์เซอร์ภายนอก</h1>' +
         '<div class="en">Please open in an external browser</div>' +
-        '<div class="why">' + SVG.warn + '<span>เบราว์เซอร์ในแอป Facebook เปิดเว็บนี้ไม่ได้ (ขึ้นหน้าขาว) — เปิดใน ' + app + ' แล้วใช้งานได้ตามปกติ</span></div>' +
+        '<div class="why">' + SVG.warn + '<span>เบราว์เซอร์ในแอป Facebook เปิดเว็บนี้ไม่ได้ (ขึ้นหน้าขาว) — เปิดใน ' + (chromeUrl ? 'Safari หรือ Chrome' : app) + ' แล้วใช้งานได้ตามปกติ</span></div>' +
         '<a class="btn p" id="dsfg-open" href="' + esc(openUrl) + '">' + SVG.compass + 'เปิดใน ' + app + '</a>' +
+        (chromeUrl ? '<a class="btn c" id="dsfg-chrome" href="' + esc(chromeUrl) + '">' + SVG.chrome + '<span>เปิดใน Chrome <small>(ถ้ามีในเครื่อง)</small></span></a>' : '') +
         '<button type="button" class="btn s" id="dsfg-copy">' + SVG.copy + '<span>คัดลอกลิงก์</span></button>' +
         '<div class="or">ถ้ากดแล้วไม่ไป ทำเองได้ 3 ขั้น</div>' +
         '<ol>' +
