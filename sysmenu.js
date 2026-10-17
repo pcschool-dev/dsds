@@ -32,18 +32,19 @@
     { id: 'saraban', name: 'งานสารบรรณ', tone: 'indigo' },
     { id: 'teach', name: 'งานครูและการเรียนการสอน', tone: 'teal' },
     { id: 'admit', name: 'งานรับนักเรียน', tone: 'amber' },
-    { id: 'account', name: 'บัญชีผู้ใช้', tone: 'slate' },   
+    { id: 'account', name: 'บัญชีผู้ใช้', tone: 'slate' }
   ];
   var SYSTEMS = [
     { id: 'doc', group: 'saraban', icon: 'bi-envelope-paper', name: 'ระบบรับหนังสือราชการ', desc: 'รับหนังสือ เสนอ สั่งการ', url: 'https://pcschool-dev.github.io/doc/' },
     { id: 'senddoc', group: 'saraban', icon: 'bi-send', name: 'ระบบบันทึกหนังสือราชการ', desc: 'ออกเลขหนังสือ ส่งหนังสือ', url: 'https://pcschool-dev.github.io/senddoc' },
-    { id: 'ask', group: 'teach', icon: 'bi-clipboard-check', name: 'ระบบประเมินครูผู้สอน', desc: 'นักเรียนประเมินการสอนของครู', url: 'https://pcschool-dev.github.io/ask/' },
-    { id: 'check', group: 'teach', icon: 'bi-check2-square', name: 'ระบบเช็กชื่อ | คะแนน', desc: 'เช็กชื่อเข้าเรียน บันทึกคะแนน', url: 'https://pcschool-dev.github.io/check/' },
-    { id: 'homework', group: 'teach', icon: 'bi-journal-text', name: 'ระบบส่งการบ้านนักเรียน', desc: 'สั่งงาน รับงาน ตรวจงานออนไลน์', url: 'https://pcschool-dev.github.io/homework/' },
-    { id: 'regpc', group: 'admit', icon: 'bi-mortarboard', name: 'ระบบรับสมัครนักเรียน', desc: 'สมัครเรียน ยืนยันสิทธิ์ รายงานตัว', url: 'https://pcschool-dev.github.io/regpc' },
-    { id: 'admin', group: 'admit', icon: 'bi-people', name: 'ระบบจัดการรับสมัครนักเรียน', desc: 'สำหรับเจ้าหน้าที่รับสมัคร', url: 'https://pcschool-dev.github.io/admin/' },
-    { id: 'account', group: 'account', icon: 'bi-person-circle', name: 'บัญชีผู้ใช้ โรงเรียนปากช่อง', desc: 'บัญชีเดียว เข้าได้ทุกระบบ', url: 'https://pcschool-dev.github.io/account'}
-     ];
+    { id: 'ask', group: 'teach', icon: 'bi-clipboard-check', name: 'ระบบประเมินครูผู้สอน', desc: 'นักเรียนประเมินการสอนของครู', soon: true, url: 'https://pcschool-dev.github.io/ask/' },
+    { id: 'check', group: 'teach', icon: 'bi-check2-square', name: 'ระบบเช็กชื่อ | คะแนน', desc: 'เช็กชื่อเข้าเรียน บันทึกคะแนน', soon: true, url: 'https://pcschool-dev.github.io/check/' },
+    { id: 'homework', group: 'teach', icon: 'bi-journal-text', name: 'ระบบส่งการบ้านนักเรียน', desc: 'สั่งงาน รับงาน ตรวจงานออนไลน์', soon: true, url: 'https://pcschool-dev.github.io/homework/' },
+    { id: 'regpc', group: 'admit', icon: 'bi-mortarboard', name: 'ระบบรับสมัครนักเรียน', desc: 'สมัครเรียน ยืนยันสิทธิ์ รายงานตัว', soon: true, url: 'https://pcschool-dev.github.io/regpc' },
+    { id: 'admin', group: 'admit', icon: 'bi-people', name: 'ระบบจัดการรับสมัครนักเรียน', desc: 'สำหรับเจ้าหน้าที่รับสมัคร', soon: true, url: 'https://pcschool-dev.github.io/admin/' },
+    { id: 'account', group: 'account', icon: 'bi-person-circle', name: 'บัญชีผู้ใช้ โรงเรียนปากช่อง', desc: 'บัญชีเดียว เข้าได้ทุกระบบ', url: 'https://pcschool-dev.github.io/account' },
+    { id: 'dss', group: 'teach', icon: 'bi-ui-radios', name: 'ระบบเช็กชื่อและกรอกคะแนน', desc: 'เช็กชื่อและกรอกคะแนนได้ในไม่กี่แตะ ใช้ได้ทั้งมือถือและคอม', url: 'https://dss-pc.web.app/' }
+  ];
   var REQUEST = { icon: 'bi-lightbulb', name: 'ขอพัฒนาเว็บแอปใช้งาน', desc: 'มีงานที่อยากให้เป็นระบบออนไลน์? แจ้งทีม DSDS',
     url: 'https://script.google.com/a/macros/pcschool.ac.th/s/AKfycbyK4gl3CxqnsRSB2FdYPJo7Nv2jQe5L_7ObjIkjfk-dxOzlRj8-lwtZFq-FCBRQFB_-Og/exec' };
   var SHEET_ID = '1MjY_5Uvw2Mgyb2ejG5sBb-mBnqaCJ79xVwI9s7aN5XA';
@@ -168,7 +169,8 @@
     systems: SYSTEMS.slice(), request: REQUEST
   };
   var okUrl = function (u) { return /^https:\/\/[^\s"'<>]+$/.test(String(u || '')); };
-  var okIcon = function (i) { return /^bi-[a-z0-9-]+$/.test(String(i || '')) ? i : 'bi-app'; };
+  // รับได้ทั้ง "bi-xxx" และ "bi bi-xxx" (คัดลอกมาจากหน้า Bootstrap Icons)
+  var okIcon = function (i) { i = String(i || '').trim().replace(/^bi\s+/, ''); return /^bi-[a-z0-9-]+$/.test(i) ? i : 'bi-app'; };
 
   function bodyHtml() {
     var toneOf = {}; DATA.groups.forEach(function (g) { toneOf[g.id] = g.tone; });
@@ -335,7 +337,7 @@
   window.DSDSMenu = {
     open: function () { open(); }, close: close, refresh: function () { refresh(true); },
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
-    get systems() { return DATA.systems.slice(); }, version: '1.1.0'
+    get systems() { return DATA.systems.slice(); }, version: '1.1.1'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
