@@ -34,7 +34,7 @@
   var force = '';
   try { force = new URLSearchParams(location.search).get('fbgate') || ''; } catch (e) { }
   var inApp = /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Instagram|Messenger/i.test(ua) || !!force;
-  window.DSDSFbGate = { blocked: inApp, version: '1.1.0' };
+  window.DSDSFbGate = { blocked: inApp, version: '1.2.0' };
   if (!inApp) return;
 
   var isAndroid = force ? force === 'android' : /Android/i.test(ua);
@@ -49,16 +49,51 @@
     // x-safari-https:// = เปิดใน Safari (iOS 17 ขึ้นไป) ; รุ่นเก่ากดแล้วไม่เกิดอะไร -> ใช้เมนู ⋯ หรือคัดลอกลิงก์
     : 'x-safari-' + cleanUrl;
 
-  var ACC = opt('accent') || '#4338ca';
-  var GRAD = opt('grad') || 'linear-gradient(135deg,#312e81 0%,#4338ca 55%,#6366f1 100%)';
+  // ชุดสี/แบบหน้าตา: data-theme="maroon" (ค่าเริ่มต้น เลือดหมู-ทอง) | "red" | "navy" | "clean" | "bold" | "indigo" (ทดสอบ: ?fbtheme=)
+  var THEMES = {
+    indigo: { acc: '#4338ca', grad: 'linear-gradient(135deg,#312e81 0%,#4338ca 55%,#6366f1 100%)', soft: '#eef2ff', line: '#c7d2fe', glow: 'rgba(67,56,202,.45)', bg: '#f1f4fb', css: '' },
+    // ก: หัวแดงเข้มไล่สี + เส้นทอง การ์ดขาวลอย
+    red: { acc: '#b91c1c', grad: 'linear-gradient(135deg,#6b0f14 0%,#a3141c 50%,#d42a2a 100%)', soft: '#fef2f2', line: '#fecaca', glow: 'rgba(185,28,28,.4)', bg: '#faf5f5', css: '' },
+    // กรมท่า-ขาว: น้ำเงินเข้มแบบหน่วยงานราชการ + เส้นทอง
+    navy: { acc: '#1e3a8a', grad: 'linear-gradient(135deg,#0b1f4d 0%,#1e3a8a 55%,#2f56b0 100%)', soft: '#eff4ff', line: '#c9d7f5', glow: 'rgba(30,58,138,.4)', bg: '#f4f6fb', css: '' },
+    // เลือดหมู-ทอง: แดงเลือดหมูสุภาพ ปุ่มหลักเลือดหมู ขอบ/เลขขั้นตอนสีทอง
+    maroon: { acc: '#7a1f2b', grad: 'linear-gradient(135deg,#3f0d14 0%,#6e1824 55%,#94303b 100%)', soft: '#fbf3e4', line: '#ecd29c', glow: 'rgba(122,31,43,.38)', bg: '#faf7f2',
+      css: '#dsds-fbgate li b.n{background:#fbf3e4;color:#8a6414;border:1px solid #ecd29c}' +
+        '#dsds-fbgate .c{color:#7a1f2b}' +
+        '#dsds-fbgate .ic{color:#a57a1d}' },
+    // ข: พื้นขาวสะอาด แถบแดงบาง ๆ ด้านบน โลโก้ใหญ่กลางจอ
+    clean: { acc: '#c8102e', grad: '#fff', soft: '#fff1f2', line: '#fecdd3', glow: 'rgba(200,16,46,.28)', bg: '#fff',
+      css: '#dsds-fbgate .top{color:#7f1d1d;padding:30px 20px 18px;border-top:6px solid #c8102e}' +
+        '#dsds-fbgate .top:after{left:20%;right:20%;height:1px;background:#fecdd3}' +
+        '#dsds-fbgate .brand{flex-direction:column;gap:8px;font-size:15px;color:#7f1d1d}' +
+        '#dsds-fbgate .brand img{width:72px;height:72px;box-shadow:none;padding:0}' +
+        '#dsds-fbgate .card{margin-top:0;box-shadow:none;padding-top:8px}' +
+        '#dsds-fbgate .ic{display:none}' +
+        '#dsds-fbgate h1{color:#9f1239}' +
+        '#dsds-fbgate .why{background:#fff1f2;border-color:#fecdd3;color:#9f1239}' +
+        '#dsds-fbgate .vid{background:#fff7f7;border-top:1px solid #fde2e4;padding:18px 0 4px;max-width:none}' },
+    // ค: แดงเต็มจอ ตัวหนังสือขาว การ์ดขาวกลางจอ
+    bold: { acc: '#c1121f', grad: 'transparent', soft: '#fff1f2', line: '#fecdd3', glow: 'rgba(0,0,0,.25)', bg: 'linear-gradient(170deg,#7a0c14 0%,#b3131e 45%,#dc2f2f 100%) fixed',
+      css: '#dsds-fbgate .top{padding:22px 20px 100px}' +
+        '#dsds-fbgate .top:after{display:none}' +
+        '#dsds-fbgate .card{box-shadow:0 24px 50px -16px rgba(0,0,0,.45)}' +
+        '#dsds-fbgate .vid h2{color:#fff}' +
+        '#dsds-fbgate .phone{background:#fff;padding:7px}' +
+        '#dsds-fbgate .ft{color:rgba(255,255,255,.8)}' }
+  };
+  var tname = '';
+  try { tname = new URLSearchParams(location.search).get('fbtheme') || ''; } catch (e) { }
+  var TH = THEMES[tname] || THEMES[opt('theme')] || THEMES.maroon;
+  var ACC = opt('accent') || TH.acc;
+  var GRAD = opt('grad') || TH.grad;
   // iPhone: ปุ่มเปิดใน Chrome อีกทาง (googlechromes:// = แอป Chrome ; ไม่มีในเครื่อง = กดแล้วไม่เกิดอะไร ยังมีปุ่ม Safari)
   var chromeUrl = isAndroid ? '' : 'googlechromes://' + url.host + url.pathname + url.search + url.hash;
 
   var CSS = '' +
     'html.dsds-fb,html.dsds-fb body{overflow:hidden!important;height:100%!important;margin:0!important}' +
     'html.dsds-fb body>*:not(#dsds-fbgate){display:none!important}' +
-    '#dsds-fbgate{position:fixed;inset:0;z-index:2147483647;background:#f1f4fb;overflow-y:auto;-webkit-overflow-scrolling:touch;' +
-      'font-family:"Sarabun","Noto Sans Thai",-apple-system,"Segoe UI",sans-serif;color:#0f172a;-webkit-font-smoothing:antialiased;--acc:' + ACC + '}' +
+    '#dsds-fbgate{position:fixed;inset:0;z-index:2147483647;overflow-y:auto;-webkit-overflow-scrolling:touch;' +
+      'font-family:"Sarabun","Noto Sans Thai",-apple-system,"Segoe UI",sans-serif;color:#0f172a;-webkit-font-smoothing:antialiased;--acc:' + ACC + ';--soft:' + TH.soft + ';--line:' + TH.line + ';--glow:' + TH.glow + ';background:' + TH.bg + '}' +
     '#dsds-fbgate *{box-sizing:border-box}' +
     '#dsds-fbgate .top{background:' + GRAD + ';padding:20px 20px 96px;color:#fff;text-align:center;position:relative;overflow:hidden}' +
     '#dsds-fbgate .top:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-1px;height:3px;background:linear-gradient(90deg,transparent,#fbbf24,transparent);opacity:.9}' +
@@ -67,7 +102,7 @@
     '#dsds-fbgate .card{position:relative;max-width:400px;margin:-60px auto 0;background:#fff;border-radius:22px;padding:26px 22px 22px;' +
       'box-shadow:0 18px 40px -12px rgba(30,41,99,.28),0 2px 6px rgba(30,41,99,.06);text-align:center}' +
     '#dsds-fbgate .ic{width:64px;height:64px;margin:-58px auto 12px;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center;' +
-      'box-shadow:0 10px 24px -8px rgba(67,56,202,.45);color:var(--acc)}' +
+      'box-shadow:0 10px 24px -8px var(--glow);color:var(--acc)}' +
     '#dsds-fbgate h1{font-size:22px;line-height:1.45;margin:0;font-weight:700}' +
     '#dsds-fbgate .en{color:#64748b;font-size:14px;margin:2px 0 10px}' +
     '#dsds-fbgate .why{display:flex;gap:10px;align-items:flex-start;text-align:left;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;' +
@@ -77,7 +112,7 @@
       'text-decoration:none;-webkit-tap-highlight-color:transparent;transition:transform .12s,box-shadow .12s}' +
     '#dsds-fbgate .btn:active{transform:scale(.98)}' +
     '#dsds-fbgate .p{padding:14px;background:var(--acc);color:#fff;font-weight:700;font-size:17px;box-shadow:0 10px 22px -10px var(--acc)}' +
-    '#dsds-fbgate .c{margin-top:10px;padding:12px;background:#eef2ff;color:var(--acc);border:1.5px solid #c7d2fe;font-weight:700;font-size:16px}' +
+    '#dsds-fbgate .c{margin-top:10px;padding:12px;background:var(--soft);color:var(--acc);border:1.5px solid var(--line);font-weight:700;font-size:16px}' +
     '#dsds-fbgate .c small{font-weight:400;color:#64748b;font-size:13px}' +
     '#dsds-fbgate .s{margin-top:10px;padding:12px;background:#fff;color:#334155;border:1.5px solid #e2e8f0;font-weight:600;font-size:15px}' +
     '#dsds-fbgate .s.ok{border-color:#86efac;background:#f0fdf4;color:#15803d}' +
@@ -86,7 +121,7 @@
     '#dsds-fbgate ol{list-style:none;margin:0;padding:0;text-align:left}' +
     '#dsds-fbgate li{display:flex;gap:12px;align-items:center;padding:9px 0;font-size:15px;line-height:1.45}' +
     '#dsds-fbgate li+li{border-top:1px dashed #e2e8f0}' +
-    '#dsds-fbgate li b.n{flex:none;width:28px;height:28px;border-radius:50%;background:#eef2ff;color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:14px}' +
+    '#dsds-fbgate li b.n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:14px}' +
     '#dsds-fbgate kbd{font:inherit;font-weight:700;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:0 6px}' +
     '#dsds-fbgate .vid{max-width:400px;margin:18px auto 0;text-align:center}' +
     '#dsds-fbgate .vid h2{font-size:15px;color:#475569;font-weight:600;margin:0 0 10px;display:flex;align-items:center;justify-content:center;gap:6px}' +
@@ -112,7 +147,7 @@
       var f = document.createElement('link'); f.rel = 'stylesheet';
       f.href = 'https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap'; head.appendChild(f);
     }
-    var st = document.createElement('style'); st.textContent = CSS; head.appendChild(st);
+    var st = document.createElement('style'); st.textContent = CSS + TH.css; head.appendChild(st);
     document.documentElement.classList.add('dsds-fb');
     var app = isAndroid ? 'Chrome' : 'Safari';
     var menu = isAndroid ? '⋮' : '⋯';
