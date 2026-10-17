@@ -46,7 +46,7 @@
     { id: 'dss', group: 'teach', icon: 'bi-ui-radios', name: 'ระบบเช็กชื่อและกรอกคะแนน', desc: 'เช็กชื่อและกรอกคะแนนได้ในไม่กี่แตะ ใช้ได้ทั้งมือถือและคอม', url: 'https://dss-pc.web.app/' }
   ];
   var REQUEST = { icon: 'bi-lightbulb', name: 'ขอพัฒนาเว็บแอปใช้งาน', desc: 'มีงานที่อยากให้เป็นระบบออนไลน์? แจ้งทีม DSDS',
-    url: 'https://script.google.com/a/macros/pcschool.ac.th/s/AKfycbyK4gl3CxqnsRSB2FdYPJo7Nv2jQe5L_7ObjIkjfk-dxOzlRj8-lwtZFq-FCBRQFB_-Og/exec' };
+    url: 'https://reqdigital.web.app' };
   var SHEET_ID = '1MjY_5Uvw2Mgyb2ejG5sBb-mBnqaCJ79xVwI9s7aN5XA';
   var SHEET_EDIT = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit';
   var TONES = { 'คราม': 'indigo', 'เขียว': 'teal', 'ส้ม': 'amber', 'เทา': 'slate', 'ชมพู': 'pink', 'ฟ้า': 'sky' };
@@ -373,7 +373,7 @@
   window.DSDSMenu = {
     open: function () { open(); }, close: close, refresh: function () { refresh(true); },
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
-    get systems() { return DATA.systems.slice(); }, version: '1.2.0'
+    get systems() { return DATA.systems.slice(); }, version: '1.2.1'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
