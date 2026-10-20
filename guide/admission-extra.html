@@ -230,9 +230,10 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font); margin
 
 .title-card, .outro { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center;
   background: radial-gradient(1200px 600px at 20% 0%, #2b4fd8 0%, transparent 60%), linear-gradient(150deg, #0f1d4a 0%, #1e3a8a 55%, #1d4ed8 120%); color: #fff; }
-.tc { width: 900px; }
-.tc-ep { font-size: 22px; font-weight: 600; letter-spacing: .14em; color: #93c5fd; }
-.tc-t { font-size: 66px; font-weight: 700; line-height: 1.15; margin: 6px 0 14px; }
+.tc { width: 1120px; }
+.tc-ep { font-size: 22px; font-weight: 600; line-height: 1.6; letter-spacing: 0; color: #93c5fd; }
+/* ชื่อตอนบรรทัดเดียว (ย่อขนาดอัตโนมัติด้วย fitTc) + ระยะบรรทัดเผื่อสระบน/วรรณยุกต์ไม่ชนบรรทัดทอง */
+.tc-t { font-size: 66px; font-weight: 700; line-height: 1.5; margin: 18px 0 12px; padding-top: .08em; white-space: nowrap; }
 .tc-w { font-size: 22px; color: #bfdbfe; }
 .tc-sys { margin-top: 46px; display: flex; align-items: center; gap: 14px; font-size: 18px; color: #dbeafe; }
 .tc-sys .logo { width: 46px; height: 46px; }
@@ -1221,6 +1222,9 @@ var STEPS = []; DATA.scenes.forEach(function (s) { if (s.step && STEPS.indexOf(s
 $('sdEp').textContent = $('tcEp').textContent = $('phEp').textContent = DATA.chapter;
 $('sdTitle').textContent = $('tcT').textContent = $('phTitle').textContent = DATA.title;
 $('sdWho').textContent = $('tcW').textContent = $('phWho').textContent = DATA.who;
+// ชื่อตอนบนการ์ดเปิดต้องอยู่บรรทัดเดียว: ย่อตัวอักษรจนพอดีความกว้างการ์ด (เรียกซ้ำเมื่อฟอนต์โหลดเสร็จ)
+function fitTc() { var t = $('tcT'), fs = 66; t.style.fontSize = fs + 'px'; while (t.scrollWidth > t.clientWidth + 1 && fs > 34) { fs -= 1; t.style.fontSize = fs + 'px'; } }
+fitTc(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTc);
 $('sdSteps').innerHTML = STEPS.map(function (s, i) {
   return '<div class="sd-step" data-i="' + i + '"><span class="sd-num">' + (i + 1) + '</span><span>' + s + '</span></div>';
 }).join('');
