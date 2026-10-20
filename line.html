@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINE ตอบคำถามและข่าวสาร · โรงเรียนปากช่อง</title>
+<!-- ลิงก์ถาวรลิงก์เดียวของทุกระบบ: ถามบอทว่า OA ไหนยังว่าง แล้วพาไปหน้าเพิ่มเพื่อนของ OA นั้น
+     OA เต็มแล้วไม่ต้องแก้ลิงก์ในระบบใดเลย -->
+<style>
+  :root { --green: #06C755; --ink: #1F2937; --muted: #6B7280; --bg: #F3F6F4; --card: #fff; --line: #E5E7EB; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Sarabun", system-ui, sans-serif; }
+  main { max-width: 420px; margin: 0 auto; padding: 32px 16px; }
+  .card { background: var(--card); border-radius: 16px; padding: 24px 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .logo { width: 56px; height: 56px; border-radius: 14px; background: var(--green); color: #fff; display: grid; place-items: center; margin: 0 auto 12px; font: 700 15px sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  #qr { display: inline-block; padding: 10px; background: #fff; border: 1px solid var(--line); border-radius: 12px; min-height: 40px; }
+  #qr img, #qr canvas { display: block; }
+  .id { font-size: 14px; color: var(--muted); margin: 8px 0 16px; }
+  .btn { display: block; background: var(--green); color: #fff; text-decoration: none; font-weight: 700; padding: 14px; border-radius: 12px; font-size: 16px; }
+  .btn[aria-disabled="true"] { background: #9CA3AF; pointer-events: none; }
+  ul { text-align: left; color: var(--muted); font-size: 13.5px; padding-left: 20px; margin: 18px 0 0; line-height: 1.6; }
+  .err { color: #B45309; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <div class="logo">LINE</div>
+    <h1>LINE ตอบคำถามและข่าวสาร</h1>
+    <p class="sub">โรงเรียนปากช่อง · ถามได้ตลอด 24 ชม. และรับข่าวประชาสัมพันธ์</p>
+    <div id="qr"><span class="sub">กำลังหาบัญชีที่ว่าง…</span></div>
+    <p class="id" id="botId"></p>
+    <a class="btn" id="add" href="#" aria-disabled="true">เพิ่มเพื่อน</a>
+    <ul>
+      <li>ถ้าเคยเพิ่มเพื่อน LINE ตอบคำถามของโรงเรียนแล้ว ไม่ต้องเพิ่มซ้ำ</li>
+      <li>บัญชีนี้แยกจาก LINE ที่ใช้เข้าสู่ระบบและลืมรหัสผ่าน</li>
+      <li>บนคอมพิวเตอร์ ใช้แอป LINE ในมือถือสแกน QR</li>
+    </ul>
+  </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  var BOT_URL = 'https://script.google.com/macros/s/AKfycbwqqMZvVG02NnE0mjqzMvgO3aLeEVgZ83S5yBZ8FhrPeVa1GzXdyalPo5e78upbnYBA/exec';
+  var mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  fetch(BOT_URL + '?action=line').then(function (r) { return r.json(); }).then(function (o) {
+    if (!o.ok) throw new Error(o.error || 'ไม่พบบัญชี');
+    var a = document.getElementById('add');
+    a.href = o.url; a.removeAttribute('aria-disabled');
+    document.getElementById('botId').textContent = o.botId;
+    var q = document.getElementById('qr'); q.innerHTML = '';
+    if (window.QRCode) new QRCode(q, { text: o.url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
+    else q.style.display = 'none';
+    if (mobile && !/[?&]stay\b/.test(location.search)) location.href = o.url;   // มือถือ: พาไปเพิ่มเพื่อนทันที
+  }).catch(function () {
+    document.getElementById('qr').innerHTML = '<p class="err">เชื่อมต่อไม่ได้ ลองรีเฟรชอีกครั้ง</p>';
+  });
+</script>
+</body>
+</html>
