@@ -49,6 +49,8 @@
     url: 'https://reqdigital.web.app' };
   var SHEET_ID = '1MjY_5Uvw2Mgyb2ejG5sBb-mBnqaCJ79xVwI9s7aN5XA';
   var SHEET_EDIT = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit';
+  // ชื่อย่อ (ป้ายหน้าชื่อระบบ ให้จำง่าย) ตามรหัสระบบ — คอลัมน์ "ชื่อย่อ" ในชีตใช้แทนได้ (ใส่ "-" = ไม่แสดงป้าย)
+  var CODES = { doc: 'DOC', senddoc: 'SEND', dss: 'DSS', ask: 'EVAL', hr: 'HR', check: 'DSS', homework: 'HW', regpc: 'REG', admin: 'ADMIT', account: 'ID' };
   var TONES = { 'คราม': 'indigo', 'เขียว': 'teal', 'ส้ม': 'amber', 'เทา': 'slate', 'ชมพู': 'pink', 'ฟ้า': 'sky' };
   var CACHE_KEY = 'dsm-list-v1', CACHE_TTL = 5 * 60 * 1000;
   var LOGO = 'https://lh5.googleusercontent.com/d/1Q28ttbihnvUUF-kEBwdEj04kVyQ8h0n-';
@@ -120,6 +122,9 @@
     '.dsm-tx { min-width: 0; flex: 1; display: flex; flex-direction: column; line-height: 1.35; }',
     '.dsm-tx b { font-weight: 600; font-size: .92rem; }',
     '.dsm-tx small { font-size: .76rem; color: #64748b; }',
+    '.dsm-code { display: inline-block; margin-right: 7px; padding: 0 6px; border-radius: 6px; vertical-align: 1px; font-size: .68rem; font-weight: 800;',
+    '  letter-spacing: .05em; line-height: 1.6; background: var(--dsm-bg); color: var(--dsm-fg); }',
+    '.dsm-item.is-current .dsm-code { background: var(--dsm-fg); color: #fff; }',
     '.dsm-go { flex: none; color: #b6c0cf; font-size: .9rem; transition: transform .15s, color .15s; }',
     'a.dsm-item:hover .dsm-go { color: var(--dsm-accent); transform: translate(2px, -2px); }',
     '.dsm-item.is-current { background: linear-gradient(90deg, #f1f3fb, #fff); }',
@@ -180,22 +185,27 @@
     '@media print { .dsm-root, .dsm-fab, [data-sysmenu] { display: none !important; } }'
   ].join('\n');
 
+  function codeOf(s) {
+    var c = s.code != null && s.code !== '' ? s.code : (CODES[s.id] || '');
+    return c === '-' ? '' : String(c).slice(0, 6);
+  }
+  function codeHtml(s) { var c = codeOf(s); return c ? '<span class="dsm-code">' + esc(c) + '</span>' : ''; }
   function itemHtml(s, tone, current) {
     if (current) {
       return '<div class="dsm-item is-current dsm-' + tone + '" aria-current="page">' +
         '<span class="dsm-ic"><i class="bi ' + esc(s.icon) + '"></i></span>' +
-        '<span class="dsm-tx"><b>' + esc(s.name) + '</b><small>คุณอยู่ที่ระบบนี้</small></span>' +
+        '<span class="dsm-tx"><b>' + codeHtml(s) + esc(s.name) + '</b><small>คุณอยู่ที่ระบบนี้</small></span>' +
         '<span class="dsm-here">ใช้อยู่</span></div>';
     }
     if (s.soon) {
       return '<div class="dsm-item is-soon dsm-' + tone + '">' +
         '<span class="dsm-ic"><i class="bi ' + esc(s.icon) + '"></i></span>' +
-        '<span class="dsm-tx"><b>' + esc(s.name) + '</b><small>' + esc(s.desc) + '</small></span>' +
+        '<span class="dsm-tx"><b>' + codeHtml(s) + esc(s.name) + '</b><small>' + esc(s.desc) + '</small></span>' +
         '<span class="dsm-soon">เร็ว ๆ นี้</span></div>';
     }
     return '<a class="dsm-item dsm-' + tone + '" href="' + esc(s.url) + '" target="_blank" rel="noopener">' +
       '<span class="dsm-ic"><i class="bi ' + esc(s.icon) + '"></i></span>' +
-      '<span class="dsm-tx"><b>' + esc(s.name) + '</b><small>' + esc(s.desc) + '</small></span>' +
+      '<span class="dsm-tx"><b>' + codeHtml(s) + esc(s.name) + '</b><small>' + esc(s.desc) + '</small></span>' +
       '<i class="bi bi-arrow-up-right dsm-go" aria-hidden="true"></i></a>';
   }
 
@@ -273,7 +283,7 @@
     var list = (rows || []).map(function (r) {
       return { order: Number(r['ลำดับ']) || 9999, id: String(r['รหัส'] || '').trim(), group: String(r['กลุ่ม'] || '').trim() || 'อื่น ๆ',
         tone: TONES[String(r['สีกลุ่ม'] || '').trim()] || '', name: String(r['ชื่อระบบ'] || '').trim(), desc: String(r['คำอธิบาย'] || '').trim(),
-        icon: okIcon(String(r['ไอคอน'] || '').trim()), url: String(r['ลิงก์'] || '').trim(), status: String(r['สถานะ'] || '').trim() };
+        code: String(r['ชื่อย่อ'] || '').trim(), icon: okIcon(String(r['ไอคอน'] || '').trim()), url: String(r['ลิงก์'] || '').trim(), status: String(r['สถานะ'] || '').trim() };
     }).filter(function (s) { return s.name && s.status !== 'ซ่อน'; });
     list.forEach(function (s) { s.soon = s.status === 'เร็ว ๆ นี้' || s.status === 'เร็วๆนี้'; });
     list = list.filter(function (s) { return s.soon || okUrl(s.url); });
@@ -287,7 +297,7 @@
     var req = { icon: REQUEST.icon, name: kv['ชื่อปุ่มขอพัฒนา'] || REQUEST.name, desc: kv['คำอธิบายปุ่มขอพัฒนา'] || REQUEST.desc,
       url: okUrl(kv['ลิงก์ปุ่มขอพัฒนา']) ? kv['ลิงก์ปุ่มขอพัฒนา'] : REQUEST.url };
     return { groups: groups, systems: list.map(function (s) {
-      return { id: s.id, group: s.group, icon: s.icon, name: s.name, desc: s.desc, url: s.url, soon: s.soon };
+      return { id: s.id, code: s.code, group: s.group, icon: s.icon, name: s.name, desc: s.desc, url: s.url, soon: s.soon };
     }), request: req };
   }
   function store(get, v) {
