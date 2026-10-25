@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>วิธีใช้ระบบข้อมูลบุคลากร (HR) · โรงเรียนปากช่อง</title>
+<meta name="description" content="บทเรียนเคลื่อนไหวพร้อมเสียงพากย์ และคู่มือแบบอ่าน สอนใช้ระบบข้อมูลบุคลากร (HR) โรงเรียนปากช่อง สำหรับครูและเจ้าหน้าที่บุคคล">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #eef4f3; --card: #fff; --fg: #0f172a; --muted: #5b6b7a; --line: #dbe7e4; --accent: #0f766e;
+  --grad: linear-gradient(135deg, #115e59 0%, #0f766e 50%, #10b981 120%); }
+@media (prefers-color-scheme: dark) { :root { --bg: #0b1716; --card: #12221f; --fg: #e3efec; --muted: #9bb3ad; --line: #22403a; --accent: #2dd4bf; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: 'Sarabun', 'Thonburi', system-ui, sans-serif; }
+.hd { background: var(--grad); color: #fff; padding: 28px 16px 34px; }
+.in { max-width: 860px; margin: 0 auto; }
+.hd small { font-weight: 600; letter-spacing: .06em; opacity: .9; }
+.hd h1 { margin: 4px 0 8px; font-size: clamp(1.5rem, 4.5vw, 2.1rem); text-wrap: balance; }
+.hd p { margin: 0; opacity: .92; line-height: 1.6; max-width: 62ch; }
+main { padding: 0 16px 40px; }
+.in.top { margin-top: -18px; }
+.note { color: var(--muted); font-size: .88rem; line-height: 1.6; margin-top: 22px; }
+.note a { color: var(--accent); }
+h2 { font-size: 1.05rem; margin: 26px 0 10px; }
+.list { display: grid; gap: 10px; }
+.ls { display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: center; background: var(--card); color: inherit; text-decoration: none;
+  border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.06); transition: transform .15s, box-shadow .15s; }
+.ls:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(15,118,110,.16); }
+.ls:focus-visible, .man:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ls-n { width: 52px; height: 52px; border-radius: 15px; background: var(--grad); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 1.3rem; }
+.st .ls-n { background: linear-gradient(135deg, #b45309, #f59e0b); }
+.ls-b { min-width: 0; display: grid; gap: 2px; }
+.ls-t { font-weight: 700; font-size: 1.08rem; }
+.ls-w { color: var(--muted); font-size: .9rem; line-height: 1.45; }
+.ls-d { text-align: right; color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; display: grid; gap: 4px; }
+.ls-go { color: var(--accent); font-weight: 600; font-size: .9rem; white-space: nowrap; }
+.man { display: flex; gap: 14px; align-items: center; background: var(--card); border: 1.5px dashed var(--accent); border-radius: 16px; padding: 14px 16px; color: inherit; text-decoration: none; margin-top: 12px; }
+.man b { display: block; font-size: 1.05rem; } .man span { color: var(--muted); font-size: .9rem; }
+.man i { font-style: normal; margin-left: auto; color: var(--accent); font-weight: 600; white-space: nowrap; }
+@media (max-width: 520px) { .ls { grid-template-columns: 44px 1fr; } .ls-n { width: 44px; height: 44px; } .ls-d { grid-column: 2; text-align: left; display: flex; gap: 12px; } .man { flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { .ls { transition: none; } }
+</style></head>
+<body><style>html.embed .ph-head,html.embed .tl-h,html.embed #tl,html.embed .note{display:none}html.embed .wrap{padding:10px 12px 14px;gap:10px}</style><script>(function(){if(window.self===window.top)return;var r=document.documentElement;r.classList.add("embed");addEventListener("message",function(e){if(e.data&&e.data.guideMode)r.classList.toggle("embed",e.data.guideMode!=="full")})})()</script>
+<header class="hd"><div class="in"><small>ระบบข้อมูลบุคลากร (HR) · โรงเรียนปากช่อง</small>
+<h1>วิธีใช้งาน ทีละขั้น พร้อมเสียงพากย์</h1>
+<p>ครูและบุคลากรทุกคนดูตอนที่ 1–3 พอ ส่วนตอนที่ 4–6 สำหรับเจ้าหน้าที่บุคคลและผู้ดูแลข้อมูล แต่ละตอนแตะข้ามไปฉากที่ต้องการได้</p></div></header>
+<main><div class="in top">
+<a class="man" href="manual.html"><div><b>คู่มือแบบอ่าน (พิมพ์ / บันทึก PDF ได้)</b><span>ทุกขั้นตอนในหน้าเดียว พร้อมภาพประกอบ</span></div><i>เปิดคู่มือ →</i></a>
+<h2>สำหรับครูและบุคลากรทุกคน</h2>
+<div class="list"><a class="ls" href="hr1-start.html">
+      <span class="ls-n">1</span>
+      <span class="ls-b"><span class="ls-t">เริ่มต้นใช้ระบบข้อมูลบุคลากร</span><span class="ls-w">เข้าสู่ระบบ · เมนูด้านล่าง · ผังบริหาร · คำสั่งแต่งตั้ง</span></span>
+      <span class="ls-d">1:59 นาที<span class="ls-go">ดูบทเรียน →</span></span></a><a class="ls" href="hr2-me.html">
+      <span class="ls-n">2</span>
+      <span class="ls-b"><span class="ls-t">ข้อมูลของฉัน</span><span class="ls-w">ความครบถ้วน · ข้อมูลทั่วไป · ตำแหน่ง · บันทึกเบื้องหลัง · แบบประวัติ PDF</span></span>
+      <span class="ls-d">2:09 นาที<span class="ls-go">ดูบทเรียน →</span></span></a><a class="ls" href="hr3-history.html">
+      <span class="ls-n">3</span>
+      <span class="ls-b"><span class="ls-t">ประวัติของฉัน และการยืนยันข้อมูล</span><span class="ls-w">รับราชการ · การศึกษา · ใบอนุญาต · เครื่องราชฯ · เติมจากเอกสาร · ประวัติการสอน · รอยืนยัน</span></span>
+      <span class="ls-d">2:08 นาที<span class="ls-go">ดูบทเรียน →</span></span></a></div>
+<h2>สำหรับเจ้าหน้าที่บุคคลและผู้ดูแลข้อมูล</h2>
+<div class="list"><a class="ls st" href="hr4-roster.html">
+      <span class="ls-n">4</span>
+      <span class="ls-b"><span class="ls-t">ภาพรวมและแก้ไขรายชื่อบุคลากร</span><span class="ls-w">ภาพรวม · แก้ในตาราง · ตัวกรอง · แก้หลายคนพร้อมกัน · ปิดใช้งาน</span></span>
+      <span class="ls-d">1:48 นาที<span class="ls-go">ดูบทเรียน →</span></span></a><a class="ls st" href="hr5-org.html">
+      <span class="ls-n">5</span>
+      <span class="ls-b"><span class="ls-t">จัดผังบริหาร และคำสั่งแต่งตั้ง</span><span class="ls-w">จัดผัง · ย้ายหัวหน้า · ดึงจากคำสั่ง · กลุ่มสาระ · นำเข้าคำสั่ง · ประกาศใช้ · แก้ไขและย้อนกลับ</span></span>
+      <span class="ls-d">1:56 นาที<span class="ls-go">ดูบทเรียน →</span></span></a><a class="ls st" href="hr6-data.html">
+      <span class="ls-n">6</span>
+      <span class="ls-b"><span class="ls-t">ยืนยันข้อมูล นำเข้า ส่งออก และเชื่อมต่อระบบ</span><span class="ls-w">รอยืนยัน · ส่งออก CSV · นำเข้า CSV · อ่านจาก PDF/รูป · เชื่อมต่อระบบอื่น</span></span>
+      <span class="ls-d">1:53 นาที<span class="ls-go">ดูบทเรียน →</span></span></a></div>
+<p class="note">ชื่อบุคคลและข้อมูลในบทเรียนเป็นข้อมูลตัวอย่าง · เข้าระบบได้ที่ <a href="https://pcschool-dev.github.io/doc/?hr=hrme">pcschool-dev.github.io/doc</a> · <a href="../">บทเรียนระบบรับหนังสือราชการ</a><br>
+งานพัฒนาและบริการระบบดิจิทัลโรงเรียน (DSDS)</p>
+</div></main>
+</body></html>
