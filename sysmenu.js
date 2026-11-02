@@ -16,6 +16,8 @@
  * มีปุ่มแบบนี้ในหน้าแล้ว -> ไม่สร้างปุ่มลอย
  * เรียกจากโค้ด: DSDSMenu.open() / DSDSMenu.close()
  *
+ *   data-audience "student" = ผู้ใช้เป็นนักเรียน -> เห็นเฉพาะระบบที่คอลัมน์ "ผู้ใช้" ในชีตเป็น นักเรียน หรือ ทุกคน (เว้นว่าง = ทุกคน)
+ *                 (หรือเรียก DSDSMenu.setAudience('student') หลังล็อกอิน; 'teacher' หรือไม่ระบุ = เห็นครบ) — แค่จัดเมนู ไม่ใช่การกันสิทธิ์
  *   data-admin    "1" = แสดงลิงก์ "จัดการรายการระบบ" ท้ายแผง (หรือเรียก DSDSMenu.setAdmin(true) หลังรู้ว่าผู้ใช้เป็นแอดมิน)
  *
  * รายการระบบ: อ่านจาก Google Sheet "รายการระบบ DSDS" (SHEET_ID ข้างล่าง) — ทีม DSDS แก้ในชีตได้เลย ไม่ต้องแก้ไฟล์นี้
@@ -52,7 +54,7 @@
   // ชื่อย่อ (ป้ายหน้าชื่อระบบ) ลำดับ: คอลัมน์ "ชื่อย่อ" ในชีต ("-" = ไม่แสดง) → CODES ด้านล่าง (รหัสที่ชื่อย่อต่างจากรหัส) → รหัสระบบตัวพิมพ์ใหญ่
   var CODES = { doc: 'DOC', senddoc: 'SEND', dss: 'DSS', ask: 'EVAL', hr: 'HR', check: 'DSS', homework: 'HW', regpc: 'REG', admin: 'ADMIT', account: 'ID', clubs: 'CLUB' };
   var TONES = { 'คราม': 'indigo', 'เขียว': 'teal', 'ส้ม': 'amber', 'เทา': 'slate', 'ชมพู': 'pink', 'ฟ้า': 'sky' };
-  var CACHE_KEY = 'dsm-list-v1', CACHE_TTL = 5 * 60 * 1000;
+  var CACHE_KEY = 'dsm-list-v2', CACHE_TTL = 5 * 60 * 1000;
   var LOGO = 'https://lh5.googleusercontent.com/d/1Q28ttbihnvUUF-kEBwdEj04kVyQ8h0n-';
   var ICONS_CSS = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
 
@@ -66,6 +68,10 @@
   var ACCENT = opt('accent', '#4338ca');
   var FAB = opt('fab', 'top-right');
   var ADMIN = opt('admin', '') === '1';
+  function audOf(v) { v = String(v || '').trim().toLowerCase(); return /^(student|นักเรียน)$/.test(v) ? 'student' : /^(teacher|ครู)$/.test(v) ? 'teacher' : ''; }
+  var AUDIENCE = audOf(opt('audience', window.DSDS_AUDIENCE || ''));   // หน้าที่โหลดก่อนเมนู ตั้ง window.DSDS_AUDIENCE ไว้ได้
+  // นักเรียนเห็นเฉพาะระบบ นักเรียน/ทุกคน ; ครูหรือไม่ระบุ = เห็นครบ
+  function shown(s) { return AUDIENCE !== 'student' || !s.aud || s.aud === 'student'; }
   // ค่าสีมาจาก attribute ที่เจ้าของระบบเขียนเอง แต่ก็กันไว้ไม่ให้หลุดออกจากค่า CSS
   function cssSafe(v) { return String(v).replace(/[;{}<>]/g, ''); }
 
@@ -224,7 +230,7 @@
     var h = '';
     if (cur) h += '<div class="dsm-sec">กำลังใช้งาน</div><div class="dsm-group">' + itemHtml(cur, toneOf[cur.group] || 'indigo', true) + '</div>';
     DATA.groups.forEach(function (g) {
-      var list = DATA.systems.filter(function (s) { return s.group === g.id && s !== cur; });
+      var list = DATA.systems.filter(function (s) { return s.group === g.id && s !== cur && shown(s); });
       if (!list.length) return;
       h += '<div class="dsm-sec">' + esc(g.name) + '</div><div class="dsm-group">' +
         list.map(function (s) { return itemHtml(s, g.tone, false); }).join('') + '</div>';
@@ -238,7 +244,7 @@
     }
     return h;
   }
-  function subText() { return DATA.systems.filter(function (s) { return !s.soon; }).length + ' ระบบ · ทีม DSDS'; }
+  function subText() { return DATA.systems.filter(function (s) { return !s.soon && shown(s); }).length + ' ระบบ · ทีม DSDS'; }
   function footHtml() {
     return ADMIN ? '<a class="dsm-admin" href="' + SHEET_EDIT + '" target="_blank" rel="noopener"><i class="bi bi-pencil-square"></i>จัดการรายการระบบ (Google Sheet)</a>'
                  : 'ลิงก์ทุกระบบเปิดในแท็บใหม่';
@@ -283,7 +289,7 @@
     var list = (rows || []).map(function (r) {
       return { order: Number(r['ลำดับ']) || 9999, id: String(r['รหัส'] || '').trim(), group: String(r['กลุ่ม'] || '').trim() || 'อื่น ๆ',
         tone: TONES[String(r['สีกลุ่ม'] || '').trim()] || '', name: String(r['ชื่อระบบ'] || '').trim(), desc: String(r['คำอธิบาย'] || '').trim(),
-        code: String(r['ชื่อย่อ'] || '').trim(), icon: okIcon(String(r['ไอคอน'] || '').trim()), url: String(r['ลิงก์'] || '').trim(), status: String(r['สถานะ'] || '').trim() };
+        code: String(r['ชื่อย่อ'] || '').trim(), icon: okIcon(String(r['ไอคอน'] || '').trim()), url: String(r['ลิงก์'] || '').trim(), status: String(r['สถานะ'] || '').trim(), aud: audOf(r['ผู้ใช้']) };
     }).filter(function (s) { return s.name && s.status !== 'ซ่อน'; });
     list.forEach(function (s) { s.soon = s.status === 'เร็ว ๆ นี้' || s.status === 'เร็วๆนี้'; });
     list = list.filter(function (s) { return s.soon || okUrl(s.url); });
@@ -297,7 +303,7 @@
     var req = { icon: REQUEST.icon, name: kv['ชื่อปุ่มขอพัฒนา'] || REQUEST.name, desc: kv['คำอธิบายปุ่มขอพัฒนา'] || REQUEST.desc,
       url: okUrl(kv['ลิงก์ปุ่มขอพัฒนา']) ? kv['ลิงก์ปุ่มขอพัฒนา'] : REQUEST.url };
     return { groups: groups, systems: list.map(function (s) {
-      return { id: s.id, code: s.code, group: s.group, icon: s.icon, name: s.name, desc: s.desc, url: s.url, soon: s.soon };
+      return { id: s.id, code: s.code, group: s.group, icon: s.icon, name: s.name, desc: s.desc, url: s.url, soon: s.soon, aud: s.aud };
     }), request: req };
   }
   function store(get, v) {
@@ -383,7 +389,8 @@
   window.DSDSMenu = {
     open: function () { open(); }, close: close, refresh: function () { refresh(true); },
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
-    get systems() { return DATA.systems.slice(); }, version: '1.2.1'
+    setAudience: function (v) { AUDIENCE = audOf(v); rerender(); },
+    get systems() { return DATA.systems.slice(); }, version: '1.3.0'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
