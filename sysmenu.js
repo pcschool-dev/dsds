@@ -49,8 +49,8 @@
     url: 'https://reqdigital.web.app' };
   var SHEET_ID = '1MjY_5Uvw2Mgyb2ejG5sBb-mBnqaCJ79xVwI9s7aN5XA';
   var SHEET_EDIT = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit';
-  // ชื่อย่อ (ป้ายหน้าชื่อระบบ ให้จำง่าย) ตามรหัสระบบ — คอลัมน์ "ชื่อย่อ" ในชีตใช้แทนได้ (ใส่ "-" = ไม่แสดงป้าย)
-  var CODES = { doc: 'DOC', senddoc: 'SEND', dss: 'DSS', ask: 'EVAL', hr: 'HR', check: 'DSS', homework: 'HW', regpc: 'REG', admin: 'ADMIT', account: 'ID', clubs: 'CLUB', care: 'CARE', cs: 'GUIDE', m6: 'M6' };
+  // ชื่อย่อ (ป้ายหน้าชื่อระบบ) ลำดับ: คอลัมน์ "ชื่อย่อ" ในชีต ("-" = ไม่แสดง) → CODES ด้านล่าง (รหัสที่ชื่อย่อต่างจากรหัส) → รหัสระบบตัวพิมพ์ใหญ่
+  var CODES = { doc: 'DOC', senddoc: 'SEND', dss: 'DSS', ask: 'EVAL', hr: 'HR', check: 'DSS', homework: 'HW', regpc: 'REG', admin: 'ADMIT', account: 'ID', clubs: 'CLUB' };
   var TONES = { 'คราม': 'indigo', 'เขียว': 'teal', 'ส้ม': 'amber', 'เทา': 'slate', 'ชมพู': 'pink', 'ฟ้า': 'sky' };
   var CACHE_KEY = 'dsm-list-v1', CACHE_TTL = 5 * 60 * 1000;
   var LOGO = 'https://lh5.googleusercontent.com/d/1Q28ttbihnvUUF-kEBwdEj04kVyQ8h0n-';
@@ -186,7 +186,7 @@
   ].join('\n');
 
   function codeOf(s) {
-    var c = s.code != null && s.code !== '' ? s.code : (CODES[s.id] || '');
+    var c = s.code != null && s.code !== '' ? s.code : (CODES[s.id] || String(s.id || '').toUpperCase());
     return c === '-' ? '' : String(c).slice(0, 6);
   }
   function codeHtml(s) { var c = codeOf(s); return c ? '<span class="dsm-code">' + esc(c) + '</span>' : ''; }
