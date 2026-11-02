@@ -35,7 +35,7 @@
     { id: 'account', name: 'บัญชีผู้ใช้', tone: 'slate' }
   ];
   var SYSTEMS = [
-    { id: 'doc', group: 'saraban', icon: 'bi-envelope-paper', name: 'ระบบรับหนังสือราชการ', desc: 'รับหนังสือ เสนอ สั่งการ', url: 'https://pcschool-dev.github.io/doc/' },
+    { id: 'doc', group: 'saraban', icon: 'bi-envelope-paper', name: 'ระบบรับหนังสือราชการ', desc: 'รับหนังสือ เสนอ สั่งการ', url: 'https://govdoc.web.app/' },
     { id: 'senddoc', group: 'saraban', icon: 'bi-send', name: 'ระบบบันทึกหนังสือราชการ', desc: 'ออกเลขหนังสือ ส่งหนังสือ', url: 'https://pcschool-dev.github.io/senddoc' },
     { id: 'ask', group: 'teach', icon: 'bi-clipboard-check', name: 'ระบบประเมินครูผู้สอน', desc: 'นักเรียนประเมินการสอนของครู', soon: true, url: 'https://pcschool-dev.github.io/ask/' },
     { id: 'check', group: 'teach', icon: 'bi-check2-square', name: 'ระบบเช็กชื่อ | คะแนน', desc: 'เช็กชื่อเข้าเรียน บันทึกคะแนน', soon: true, url: 'https://pcschool-dev.github.io/check/' },
