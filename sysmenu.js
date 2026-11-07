@@ -15,6 +15,8 @@
  *   <button type="button" data-sysmenu aria-label="ระบบอื่นของโรงเรียน"><i class="bi bi-list"></i></button>
  * มีปุ่มแบบนี้ในหน้าแล้ว -> ไม่สร้างปุ่มลอย
  * เรียกจากโค้ด: DSDSMenu.open() / DSDSMenu.close()
+ *   data-splash   "off" = ไม่แสดงหน้าสโลแกน DSDS ครั้งแรกของวัน ; หลังออกจากระบบเรียก DSDSMenu.splash()
+ * กล่องเกี่ยวกับ/ติดต่องาน DSDS (about.js): ปุ่มท้ายแผงมีให้เอง ; เปิดจากโค้ด DSDSMenu.about() — แถวสถานะ LINE ต่อระบบ ดูหัว about.js
  *
  *   data-audience "student" = ผู้ใช้เป็นนักเรียน -> เห็นเฉพาะระบบที่คอลัมน์ "ผู้ใช้" ในชีตเป็น นักเรียน หรือ ทุกคน (เว้นว่าง = ทุกคน)
  *                 (หรือเรียก DSDSMenu.setAudience('student') หลังล็อกอิน; 'teacher' หรือไม่ระบุ = เห็นครบ) — แค่จัดเมนู ไม่ใช่การกันสิทธิ์
@@ -142,6 +144,10 @@
     '.dsm-req:hover .dsm-go { transform: translateX(3px); color: #b45309; }',
     '.dsm-foot { flex: none; text-align: center; font-size: .72rem; color: #94a3b8; padding: 8px 12px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));',
     '  border-top: 1px solid #e6ebf3; background: #fff; }',
+    '.dsm-about { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 40px; margin: 0 0 6px; padding: 0 12px;',
+    '  border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; color: #0f172a; font: inherit; font-size: .84rem; font-weight: 600; cursor: pointer; }',
+    '.dsm-about:hover, .dsm-about:focus-visible { background: #eff6ff; border-color: #bfdbfe; outline: none; }',
+    '.dsm-about .bi-line { color: #06c755; font-size: 1.05rem; }',
     '.dsm-fab { position: fixed; z-index: 2147482000; width: 42px; height: 42px; padding: 0; margin: 0; border-radius: 13px; cursor: pointer;',
     '  border: 1.5px solid rgba(255,255,255,.9); background: var(--dsm-grad); color: #fff; font-size: 1.4rem; line-height: 1;',
     '  display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(15,23,42,.25); transition: transform .12s, box-shadow .15s; }',
@@ -178,6 +184,8 @@
     'html[data-theme="dark"] .dsm-req .dsm-ic, html[data-bs-theme="dark"] .dsm-req .dsm-ic { --dsm-bg: #4a3a1a; --dsm-fg: #fcd34d; }',
     'html[data-theme="dark"] .dsm-req:hover .dsm-go, html[data-bs-theme="dark"] .dsm-req:hover .dsm-go { color: #fcd34d; }',
     'html[data-theme="dark"] .dsm-foot, html[data-bs-theme="dark"] .dsm-foot { background: #1b212b; border-top-color: #2a3240; color: #7f8da1; }',
+    'html[data-theme="dark"] .dsm-about, html[data-bs-theme="dark"] .dsm-about { background: #10151e; border-color: #2a3240; color: #e6ebf3; }',
+    'html[data-theme="dark"] .dsm-about:hover, html[data-bs-theme="dark"] .dsm-about:hover { background: #222a36; }',
     'html[data-theme="warm"] .dsm-panel { background: #ede6d8; color: #2f281f; }',
     'html[data-theme="warm"] .dsm-sec { color: #7a6e5f; }',
     'html[data-theme="warm"] .dsm-group { background: #f9f3e8; border-color: #e5dccb; }',
@@ -245,9 +253,33 @@
     return h;
   }
   function subText() { return DATA.systems.filter(function (s) { return !s.soon && shown(s); }).length + ' ระบบ · ทีม DSDS'; }
+  // ปุ่มกล่อง "เกี่ยวกับ/ติดต่องาน DSDS" (about.js โหลดตอนกดครั้งแรก) — ทุกระบบได้กล่องเดียวกันโดยไม่ต้องแก้ระบบ
   function footHtml() {
-    return ADMIN ? '<a class="dsm-admin" href="' + SHEET_EDIT + '" target="_blank" rel="noopener"><i class="bi bi-pencil-square"></i>จัดการรายการระบบ (Google Sheet)</a>'
-                 : 'ลิงก์ทุกระบบเปิดในแท็บใหม่';
+    return '<button type="button" class="dsm-about" data-dsds-about-load><i class="bi bi-line" aria-hidden="true"></i>ติดต่อทีมงาน DSDS · ขอความช่วยเหลือ</button>' + (ADMIN ? '<a class="dsm-admin" href="' + SHEET_EDIT + '" target="_blank" rel="noopener"><i class="bi bi-pencil-square"></i>จัดการรายการระบบ (Google Sheet)</a>'
+                 : 'ลิงก์ทุกระบบเปิดในแท็บใหม่');
+  }
+  var ABOUT_SRC = (me && me.src ? me.src.replace(/sysmenu\.js(\?.*)?$/, 'about.js') : '') || 'https://pcschool-dev.github.io/dsds/about.js';
+  var aboutQ = null;
+  function withAbout(fn, fail) {
+    if (window.DSDSAbout) { fn(window.DSDSAbout); return; }
+    if (aboutQ) { aboutQ.push(fn); return; }
+    aboutQ = [fn];
+    var sc = document.createElement('script'); sc.src = ABOUT_SRC + '?v=' + Math.floor(Date.now() / 36e5);   // แคชได้ชั่วโมงละครั้ง
+    sc.onload = function () { var q = aboutQ || []; aboutQ = null; if (window.DSDSAbout) q.forEach(function (f) { f(window.DSDSAbout); }); };
+    sc.onerror = function () { aboutQ = null; if (fail) fail(); };
+    document.head.appendChild(sc);
+  }
+  function openAbout() {
+    withAbout(function (A) { A.open(); }, function () { window.open('https://pcschool-dev.github.io/dsds/line.html', '_blank', 'noopener'); });
+  }
+  // หน้าสโลแกน DSDS: ครั้งแรกของวัน (เช็กวันในเครื่องก่อน ไม่โหลด about.js ถ้าเคยเห็นแล้ว) ; force = หลังออกจากระบบ
+  var SPLASH = opt('splash', '') !== 'off' && !(window.DSDS_ABOUT && window.DSDS_ABOUT.splash === false);
+  function splash(force) {
+    if (!SPLASH && !force) return;
+    if (!force) { var d = new Date(), t = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(), s = null;
+      try { s = localStorage.getItem('dsds.splash.day'); } catch (e) {}
+      if (s === t) return; }
+    withAbout(function (A) { A.splash({ force: !!force }); });
   }
   function panelHtml() {
     return '<div class="dsm-scrim" data-dsm-close></div>' +
@@ -365,12 +397,14 @@
     if (!t) return;
     var b = t.closest('[data-sysmenu], .dsm-fab');
     if (b) { e.preventDefault(); open(b); return; }
+    if (t.closest('[data-dsds-about-load]')) { e.preventDefault(); close(); openAbout(); return; }
     if (t.closest('[data-dsm-close]')) { e.preventDefault(); close(); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 
   function init() {
     ensure();
+    splash(false);
     refresh(false);
     document.querySelectorAll('[data-sysmenu]').forEach(function (b) {
       b.setAttribute('aria-controls', 'dsmPanel'); b.setAttribute('aria-expanded', 'false');
@@ -390,7 +424,8 @@
     open: function () { open(); }, close: close, refresh: function () { refresh(true); },
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
     setAudience: function (v) { AUDIENCE = audOf(v); rerender(); },
-    get systems() { return DATA.systems.slice(); }, version: '1.3.0'
+    about: openAbout, splash: function () { splash(true); },
+    get systems() { return DATA.systems.slice(); }, version: '1.4.0'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
