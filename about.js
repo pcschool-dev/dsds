@@ -215,7 +215,9 @@
   }
 
   // ===== หน้าสโลแกน: ครั้งแรกของวัน (ต่อเว็บ) + หลังออกจากระบบ (ระบบเรียก splash({force:true})) แล้วเฟดหาย =====
-  var DAY_KEY = 'dsds.splash.day', splashEl = null;
+  // PEND (sessionStorage): ยังโชว์ไม่ครบแต่หน้าเปลี่ยนไปก่อน (ออกจากระบบ -> หน้า login โหลดใหม่) -> หน้าถัดไปในแท็บเดิมโชว์ต่อ
+  var DAY_KEY = 'dsds.splash.day', PEND = 'dsds.splash.pending', splashEl = null;
+  function pend(v) { try { if (v) sessionStorage.setItem(PEND, '1'); else sessionStorage.removeItem(PEND); } catch (e) {} }
   function today() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   function splash(o) {
     o = o || {};
@@ -223,6 +225,7 @@
     var seen = null; try { seen = localStorage.getItem(DAY_KEY); } catch (e) {}
     if (!o.force && seen === today()) return false;
     try { localStorage.setItem(DAY_KEY, today()); } catch (e) {}
+    pend(true);
     ensureStyle();
     var el = splashEl = document.createElement('div');
     el.className = 'dsa-splash'; el.setAttribute('role', 'status'); el.setAttribute('aria-label', 'งานพัฒนาและบริการระบบดิจิทัลโรงเรียน');
@@ -234,6 +237,7 @@
     var done = false;
     function out() {
       if (done) return; done = true;
+      pend(false);
       el.classList.add('is-out');
       setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); if (splashEl === el) splashEl = null; }, 650);
     }
@@ -241,7 +245,10 @@
     document.addEventListener('keydown', function k(e) { document.removeEventListener('keydown', k, true); out(); }, true);
     (document.body || document.documentElement).appendChild(el);
     fitTitle(el.querySelector('.dsa-title'));
-    setTimeout(out, Math.max(800, Number(o.ms) || 2600));   // ค้างพออ่านสโลแกนจบ แล้วเฟด .6 วิ
+    // นับเวลาหลังหน้าโหลดเสร็จ (หน้า login มาครบอยู่ข้างใต้) ค้างพออ่านสโลแกนจบ แล้วเฟด .6 วิ
+    var hold = Math.max(800, Number(o.ms) || 2800);
+    if (document.readyState === 'complete') setTimeout(out, hold);
+    else window.addEventListener('load', function () { setTimeout(out, hold); });
     return true;
   }
 

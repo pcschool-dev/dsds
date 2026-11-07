@@ -15,7 +15,8 @@
  *   <button type="button" data-sysmenu aria-label="ระบบอื่นของโรงเรียน"><i class="bi bi-list"></i></button>
  * มีปุ่มแบบนี้ในหน้าแล้ว -> ไม่สร้างปุ่มลอย
  * เรียกจากโค้ด: DSDSMenu.open() / DSDSMenu.close()
- *   data-splash   "off" = ไม่แสดงหน้าสโลแกน DSDS ครั้งแรกของวัน ; หลังออกจากระบบเรียก DSDSMenu.splash()
+ *   data-splash   "off" = ไม่แสดงหน้าสโลแกน DSDS ครั้งแรกของวัน
+ *   หลังออกจากระบบ: จับปุ่ม "ออกจากระบบ"/logout ให้เอง (1.5.0) ; ปิดเฉพาะส่วนนี้ data-splash-logout="off" ; เรียกเองได้ DSDSMenu.splash()
  * กล่องเกี่ยวกับ/ติดต่องาน DSDS (about.js): ปุ่มท้ายแผงมีให้เอง ; เปิดจากโค้ด DSDSMenu.about() — แถวสถานะ LINE ต่อระบบ ดูหัว about.js
  *
  *   data-audience "student" = ผู้ใช้เป็นนักเรียน -> เห็นเฉพาะระบบที่คอลัมน์ "ผู้ใช้" ในชีตเป็น นักเรียน หรือ ทุกคน (เว้นว่าง = ทุกคน)
@@ -276,10 +277,74 @@
   var SPLASH = opt('splash', '') !== 'off' && !(window.DSDS_ABOUT && window.DSDS_ABOUT.splash === false);
   function splash(force) {
     if (!SPLASH && !force) return;
+    var p = null; try { p = sessionStorage.getItem('dsds.splash.pending'); } catch (e) {}
+    if (p) force = true;   // หน้าก่อนในแท็บนี้โชว์ไม่ครบ (เช่น ออกจากระบบแล้วโหลดหน้า login ใหม่) -> โชว์ต่อที่หน้านี้
     if (!force) { var d = new Date(), t = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(), s = null;
       try { s = localStorage.getItem('dsds.splash.day'); } catch (e) {}
       if (s === t) return; }
+    disarm();
     withAbout(function (A) { A.splash({ force: !!force }); });
+  }
+
+  // ===== สโลแกนหลังออกจากระบบ อัตโนมัติทุกระบบ (ไม่ต้องแก้โค้ดของระบบ) =====
+  // กดปุ่ม/ลิงก์ "ออกจากระบบ" (หรือ id/class/onclick มีคำว่า logout/signout) -> เฝ้าดู 20 วิ
+  //  - หน้า login โผล่มา (ช่องรหัสผ่าน/กล่องที่ id-class มี login เพิ่งมองเห็น หรือข้อความ "ออกจากระบบแล้ว") -> โชว์สโลแกน
+  //  - หน้าโหลดใหม่/เปลี่ยนหน้า -> หน้าถัดไปในแท็บเดิมโชว์ (sessionStorage)
+  //  - กด "ยกเลิก" ในกล่องยืนยัน / หมดเวลา -> ไม่โชว์
+  // ปิดเฉพาะส่วนนี้: data-splash-logout="off" ; ระบบเรียก DSDSMenu.splash() เองก็ได้ ไม่โชว์ซ้ำ
+  var LOGOUT_KEY = 'dsds.splash.logout', LOGOUT_MS = 20000, AUTO_LOGOUT = SPLASH && opt('splash-logout', '') !== 'off';
+  var armAt = 0, armSeen = null, armObs = null, armTimer = null;
+  var LOGIN_SEL = 'input[type=password], [id*=login i], [class*=login i], [id*=signin i], [class*=signin i]';
+  function visible(el) { return !!(el && (el.offsetWidth || el.offsetHeight || el.getClientRects().length)) && getComputedStyle(el).visibility !== 'hidden'; }
+  function loginVisibleNow() {
+    var out = [];
+    document.querySelectorAll(LOGIN_SEL).forEach(function (el) { if (!el.closest('.dsm-root, .dsa-splash') && visible(el)) out.push(el); });
+    return out;
+  }
+  function disarm() {
+    armAt = 0; armSeen = null;
+    if (armObs) { armObs.disconnect(); armObs = null; }
+    if (armTimer) { clearInterval(armTimer); armTimer = null; }
+    try { sessionStorage.removeItem(LOGOUT_KEY); } catch (e) {}
+  }
+  function armCheck() {
+    if (!armAt) return;
+    if (Date.now() - armAt > LOGOUT_MS) { disarm(); return; }
+    var hit = loginVisibleNow().some(function (el) { return armSeen.indexOf(el) < 0; });
+    if (!hit) { var b = document.body && document.body.innerText || ''; hit = b.indexOf('ออกจากระบบแล้ว') >= 0 && armSeen.done !== true; }
+    if (hit) splash(true);
+  }
+  function arm() {
+    disarm();
+    armAt = Date.now(); armSeen = loginVisibleNow();
+    armSeen.done = ((document.body && document.body.innerText) || '').indexOf('ออกจากระบบแล้ว') >= 0;
+    try { sessionStorage.setItem(LOGOUT_KEY, String(armAt)); } catch (e) {}
+    if (window.MutationObserver) {
+      var q = 0;
+      armObs = new MutationObserver(function () { if (!q) { q = 1; setTimeout(function () { q = 0; armCheck(); }, 120); } });
+      armObs.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+    }
+    armTimer = setInterval(armCheck, 500);
+  }
+  function isLogoutEl(el) {
+    if (el.closest('.dsm-root, .dsa-splash, .dsa-root')) return false;
+    var key = [el.id, typeof el.className === 'string' ? el.className : '', el.getAttribute('onclick') || '', el.getAttribute('href') || '', el.getAttribute('data-action') || ''].join(' ');
+    if (/log-?out|sign-?out/i.test(key)) return true;
+    var tx = ((el.textContent || '') + ' ' + (el.getAttribute('title') || '') + ' ' + (el.getAttribute('aria-label') || '')).replace(/\s+/g, ' ').trim();
+    return tx.length <= 40 && /ออกจากระบบ|ล็อกเอาต์|log ?out|sign ?out/i.test(tx) && !/ออกจากระบบแล้ว|อัตโนมัติ/.test(tx);
+  }
+  if (AUTO_LOGOUT) {
+    document.addEventListener('click', function (e) {
+      var t = e.target && e.target.closest ? e.target.closest('button, a, [role=button], [role=menuitem], .dropdown-item, input[type=button], input[type=submit]') : null;
+      if (!t) return;
+      if (isLogoutEl(t)) { arm(); return; }
+      if (armAt && (t.closest('.swal2-cancel, .swal2-deny, .swal2-close, [data-bs-dismiss=modal]') || /^(ยกเลิก|ไม่|cancel)$/i.test((t.textContent || '').trim()))) disarm();
+    }, true);
+    document.addEventListener('keydown', function (e) { if (armAt && e.key === 'Escape') disarm(); }, true);
+  }
+  function logoutCarried() {   // หน้าก่อนในแท็บนี้เพิ่งกดออกจากระบบแล้วหน้าโหลดใหม่ -> โชว์ที่หน้านี้
+    var v = null; try { v = Number(sessionStorage.getItem(LOGOUT_KEY)); sessionStorage.removeItem(LOGOUT_KEY); } catch (e) {}
+    return AUTO_LOGOUT && v && Date.now() - v < LOGOUT_MS;
   }
   function panelHtml() {
     return '<div class="dsm-scrim" data-dsm-close></div>' +
@@ -404,7 +469,7 @@
 
   function init() {
     ensure();
-    splash(false);
+    splash(logoutCarried());
     refresh(false);
     document.querySelectorAll('[data-sysmenu]').forEach(function (b) {
       b.setAttribute('aria-controls', 'dsmPanel'); b.setAttribute('aria-expanded', 'false');
@@ -425,7 +490,7 @@
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
     setAudience: function (v) { AUDIENCE = audOf(v); rerender(); },
     about: openAbout, splash: function () { splash(true); },
-    get systems() { return DATA.systems.slice(); }, version: '1.4.0'
+    get systems() { return DATA.systems.slice(); }, version: '1.5.0'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
