@@ -9,36 +9,108 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-  :root { --bg: #f4f5f8; --card: #fff; --ink: #0f172a; --mute: #64748b; --line: #e7eaf0; --brand: #8a2432; --soft: #fbeef0; }
+  :root { --bg: #f4f5f8; --card: #fff; --ink: #0f172a; --mute: #64748b; --line: #e7eaf0; --brand: #8a2432; --soft: #fbeef0;
+    --g: #e8f6ee; --gi: #15803d; --b: #e8f0fe; --bi: #1d4ed8; --y: #fff6e0; --yi: #b45309; --p: #f1ecfd; --pi: #6d28d9; --t: #e6f7f6; --ti: #0f766e; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #0f131a; --card: #171c25; --ink: #e8effc; --mute: #9aa6b8; --line: #252c38; --brand: #e58a9b; --soft: #3a1d24; }
+    :root { --bg: #0f131a; --card: #171c25; --ink: #e8effc; --mute: #9aa6b8; --line: #252c38; --brand: #e58a9b; --soft: #3a1d24;
+      --g: #15301f; --gi: #4ade80; --b: #172443; --bi: #93b4fb; --y: #33270f; --yi: #fbbf24; --p: #251c3f; --pi: #c4b5fd; --t: #11302e; --ti: #5eead4; }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Sarabun', system-ui, sans-serif; font-size: 16px; line-height: 1.65; }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
-  header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Sarabun', system-ui, sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 22px 16px 48px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
   header img { width: 52px; height: 52px; border-radius: 50%; background: #fff; flex: none; }
-  h1 { font-size: clamp(1.25rem, 4vw, 1.6rem); margin: 0; line-height: 1.3; }
-  .sub { color: var(--mute); font-size: .92rem; }
-  .card { background: var(--card); border-radius: 18px; box-shadow: 0 2px 10px rgba(15,23,42,.06); padding: 18px 20px; margin-bottom: 14px; }
-  h2 { font-size: 1.1rem; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  h1 { font-size: clamp(1.25rem, 4.2vw, 1.65rem); margin: 0; line-height: 1.3; }
+  .sub { color: var(--mute); font-size: .88rem; }
+  .card { background: var(--card); border-radius: 20px; box-shadow: 0 2px 10px rgba(15,23,42,.06); padding: 20px; margin-bottom: 14px; }
+  h2 { font-size: 1.12rem; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
   h2 i { color: var(--brand); }
-  p { margin: 0 0 8px; }
-  ul { margin: 0; padding-left: 1.2em; }
-  li { margin: 2px 0; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; align-items: stretch; }
-  .sys { display: flex; flex-direction: column; height: 100%; margin: 0; }
-  .sys h3 { margin: 0 0 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
-  .sys h3 span { flex: none; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--soft); color: var(--brand); }
-  .row { padding: 6px 0; border-top: 1px solid var(--line); font-size: .9rem; }
-  .row b { display: block; font-size: .78rem; color: var(--mute); font-weight: 600; }
-  .row ul { padding-left: 1.1em; }
+  .lead { color: var(--mute); font-size: .9rem; margin: 0 0 14px; }
+  .ic { flex: none; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.35rem; }
+  .c-g { background: var(--g); color: var(--gi); } .c-b { background: var(--b); color: var(--bi); } .c-y { background: var(--y); color: var(--yi); }
+  .c-p { background: var(--p); color: var(--pi); } .c-t { background: var(--t); color: var(--ti); } .c-r { background: var(--soft); color: var(--brand); }
+
+  /* คำมั่น 3 ข้อ */
+  .promise { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .pr { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 16px; border: 1px solid var(--line); }
+  .pr b { display: block; font-size: 1rem; line-height: 1.35; }
+  .pr small { color: var(--mute); font-size: .82rem; line-height: 1.45; display: block; }
+
+  /* เส้นทางข้อมูล */
+  .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; align-items: stretch; counter-reset: st; }
+  .st { position: relative; text-align: center; padding: 0 8px; }
+  .st .ic { margin: 0 auto 8px; width: 58px; height: 58px; border-radius: 18px; font-size: 1.6rem; }
+  .st b { display: block; font-size: .95rem; line-height: 1.35; }
+  .st small { display: block; color: var(--mute); font-size: .8rem; line-height: 1.45; margin-top: 2px; }
+  .st:not(:last-child)::after { content: ''; position: absolute; top: 29px; left: calc(50% + 36px); right: calc(-50% + 36px); border-top: 2px dashed var(--line); }
+  .st:not(:last-child)::before { content: '\F138'; font-family: 'bootstrap-icons'; position: absolute; top: 18px; right: -10px; color: var(--mute); font-size: 1rem; z-index: 1; background: var(--card); }
+  .flow-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; font-size: .82rem; font-weight: 600; }
+
+  /* ใครเห็นอะไร */
+  .who { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .wh { border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; height: 100%; }
+  .wh-h { display: flex; align-items: center; gap: 10px; }
+  .wh-h b { font-size: 1rem; }
+  .see { display: flex; gap: 8px; font-size: .86rem; line-height: 1.5; }
+  .see i { flex: none; margin-top: 2px; }
+  .yes i { color: var(--gi); } .no i { color: var(--brand); }
+  .no { color: var(--mute); }
+
+  /* ชั้นป้องกัน */
+  .shield { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .sh { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 16px; border: 1px solid var(--line); height: 100%; }
+  .sh .n { font-size: .72rem; font-weight: 700; color: var(--mute); }
+  .sh b { display: block; font-size: .95rem; line-height: 1.35; }
+  .sh small { display: block; color: var(--mute); font-size: .82rem; line-height: 1.5; margin-top: 2px; }
+
+  /* ที่เก็บ */
+  .store { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .so { border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; height: 100%; }
+  .so-h { display: flex; gap: 10px; align-items: center; }
+  .so-h b { font-size: .95rem; line-height: 1.35; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag { font-size: .75rem; padding: 2px 9px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+  .so p { margin: 0; font-size: .84rem; color: var(--mute); line-height: 1.5; }
+
+  /* รายละเอียดรายระบบ */
+  details.more > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary .bi-chevron-down { margin-left: auto; transition: transform .2s; color: var(--mute); }
+  details.more[open] > summary .bi-chevron-down { transform: rotate(180deg); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-items: stretch; margin-top: 14px; }
+  .sys { border: 1px solid var(--line); border-radius: 16px; padding: 14px; height: 100%; }
+  .sys h3 { margin: 0 0 6px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .sys h3 i { color: var(--brand); }
+  .row { padding: 6px 0; border-top: 1px solid var(--line); font-size: .88rem; }
+  .row b { display: block; font-size: .76rem; color: var(--mute); font-weight: 600; }
+  .row ul { margin: 0; padding-left: 1.1em; }
+
+  .rights { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 6px 0 14px; }
+  .rg { text-align: center; padding: 12px 6px; border-radius: 16px; border: 1px solid var(--line); font-size: .86rem; font-weight: 600; line-height: 1.35; }
+  .rg .ic { margin: 0 auto 6px; width: 40px; height: 40px; font-size: 1.15rem; }
   .pill { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 999px; background: var(--brand); color: #fff; text-decoration: none; font-weight: 600; }
+  @media (prefers-color-scheme: dark) { .pill { color: #1a0d10; } }
   .muted { color: var(--mute); font-size: .85rem; }
-  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-  th, td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
-  th { font-size: .8rem; color: var(--mute); font-weight: 600; border-top: 0; }
-  .tbl { overflow-x: auto; }
+
+  @media (max-width: 860px) {
+    .promise, .who, .shield, .store { grid-template-columns: 1fr 1fr; }
+    .rights { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .promise, .who, .store { grid-template-columns: 1fr; }
+    .shield { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sh { flex-direction: column; gap: 8px; padding: 12px; }
+    .sh .ic { width: 40px; height: 40px; font-size: 1.15rem; }
+    .rights { grid-template-columns: repeat(3, 1fr); }
+    /* เส้นทางข้อมูลเป็นแนวตั้ง */
+    .flow { grid-template-columns: 1fr; gap: 14px; }
+    .st { display: grid; grid-template-columns: 58px 1fr; gap: 0 12px; text-align: left; align-items: center; padding: 0; }
+    .st .ic { margin: 0; grid-row: span 2; }
+    .st small { margin-top: 0; }
+    .st:not(:last-child)::after { top: 62px; bottom: -14px; left: 28px; right: auto; border-top: 0; border-left: 2px dashed var(--line); }
+    .st:not(:last-child)::before { content: none; }
+  }
 </style>
 </head>
 <body>
@@ -46,54 +118,126 @@
   <header>
     <img src="https://lh5.googleusercontent.com/d/1Q28ttbihnvUUF-kEBwdEj04kVyQ8h0n-" alt="">
     <div>
-      <h1>ความเป็นส่วนตัวและความปลอดภัยข้อมูล</h1>
+      <h1>ข้อมูลของคุณปลอดภัยอย่างไร</h1>
       <div class="sub">ระบบดิจิทัลโรงเรียนปากช่อง · งานพัฒนาและบริการระบบดิจิทัล (DSDS) · ปรับปรุงล่าสุด 15 พฤศจิกายน 2569</div>
     </div>
   </header>
 
+  <!-- คำมั่น -->
   <div class="card">
-    <h2><i class="bi bi-bank"></i>หลักการ</h2>
-    <p>โรงเรียนเก็บและใช้ข้อมูลส่วนบุคคลของครู นักเรียน และผู้ปกครอง เพื่อปฏิบัติหน้าที่ตามภารกิจของรัฐ (พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 มาตรา 24(4)) เก็บเท่าที่จำเป็น ไม่ขาย ไม่ใช้เพื่อการค้า และให้ฝ่ายที่รับผิดชอบข้อมูลแต่ละเรื่องเป็นผู้ดูแลความถูกต้อง</p>
-    <p class="muted">ทุกระบบแสดงการแจ้งนี้ครั้งแรกที่เข้าใช้ และเปิดอ่านซ้ำได้ที่เมนู ☰ › ความเป็นส่วนตัวและข้อมูล</p>
+    <div class="promise">
+      <div class="pr"><span class="ic c-g"><i class="bi bi-funnel"></i></span><div><b>เก็บเท่าที่จำเป็น</b><small>เฉพาะข้อมูลที่ใช้ทำงานของโรงเรียน ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล มาตรา 24(4)</small></div></div>
+      <div class="pr"><span class="ic c-b"><i class="bi bi-person-lock"></i></span><div><b>เห็นเฉพาะผู้มีสิทธิ์</b><small>แต่ละคนเห็นเฉพาะข้อมูลที่เกี่ยวกับหน้าที่ของตน</small></div></div>
+      <div class="pr"><span class="ic c-r"><i class="bi bi-ban"></i></span><div><b>ไม่ขาย ไม่ใช้เชิงการค้า</b><small>ไม่ส่งต่อให้บุคคลภายนอกโดยไม่มีเหตุตามกฎหมาย</small></div></div>
+    </div>
   </div>
 
+  <!-- เส้นทางข้อมูล -->
   <div class="card">
-    <h2><i class="bi bi-cloud-check"></i>ข้อมูลเก็บที่ไหน ใครเข้าถึงได้</h2>
-    <div class="tbl"><table>
-      <thead><tr><th>ที่เก็บข้อมูล</th><th>ใช้กับ</th><th>ใครเข้าถึงได้ และอย่างไร</th></tr></thead>
-      <tbody>
-        <tr><td>Google Firebase / Google Cloud (โปรเจกต์ของโรงเรียน)</td><td>ระบบเช็คชื่อและคะแนน, รับหนังสือราชการ, ข้อมูลบุคลากร, ระบบแผน, ระบบงานแนะแนว</td><td>ผู้ใช้เข้าผ่านหน้าเว็บหลังเข้าสู่ระบบ เห็นเฉพาะข้อมูลตามสิทธิ์ (กำหนดด้วยกฎความปลอดภัยฝั่งเซิร์ฟเวอร์) · หลังบ้านเข้าได้เฉพาะผู้ดูแลระบบของทีม DSDS</td></tr>
-        <tr><td>Google Sheets / Drive (บัญชีโรงเรียน) ผ่าน Google Apps Script</td><td>รับสมัครนักเรียน, ประเมินครู, บัญชีผู้ใช้กลาง, บันทึกหนังสือส่ง, LINE ถาม-ตอบ</td><td>ผู้ใช้ทั่วไปไม่เห็นตารางข้อมูลโดยตรง ระบบอ่าน-เขียนแทนตามสิทธิ์ · ไฟล์ข้อมูลแชร์เฉพาะผู้รับผิดชอบงานและผู้ดูแลระบบ</td></tr>
-        <tr><td>Google Shared Drive ของโรงเรียน</td><td>ไฟล์แนบหนังสือราชการ, ไฟล์สำรองข้อมูล</td><td>สมาชิก Shared Drive ที่ได้รับมอบหมาย และบัญชีบริการของระบบ</td></tr>
-        <tr><td>GitHub Pages / Firebase Hosting</td><td>ตัวหน้าเว็บ (โค้ด) ของทุกระบบ</td><td>เก็บเฉพาะโค้ดหน้าเว็บ ไม่มีข้อมูลส่วนบุคคล</td></tr>
-        <tr><td>LINE Official Account</td><td>แจ้งเตือนและ LINE ถาม-ตอบ</td><td>ใช้เมื่อผู้ใช้เชื่อมบัญชี LINE เอง · ส่งเฉพาะข้อความแจ้งเตือนที่จำเป็น</td></tr>
-        <tr><td>บริการ AI (Claude ของ Anthropic)</td><td>ตอบคำถามนักเรียนใน LINE ถาม-ตอบ</td><td>ส่งเฉพาะข้อความคำถาม ไม่ส่งข้อมูลบุคลากรหรือข้อมูลส่วนบุคคลจากฐานข้อมูลของโรงเรียน</td></tr>
-      </tbody>
-    </table></div>
+    <h2><i class="bi bi-signpost-split"></i>ข้อมูลเดินทางอย่างไร</h2>
+    <p class="lead">ตั้งแต่คุณกดเข้าระบบ จนข้อมูลถูกเก็บและสำรอง</p>
+    <div class="flow">
+      <div class="st"><span class="ic c-b"><i class="bi bi-phone"></i></span><b>คุณเปิดระบบ</b><small>มือถือหรือคอมพิวเตอร์</small></div>
+      <div class="st"><span class="ic c-g"><i class="bi bi-lock"></i></span><b>ส่งแบบเข้ารหัส</b><small>HTTPS คนกลางอ่านไม่ได้</small></div>
+      <div class="st"><span class="ic c-y"><i class="bi bi-key"></i></span><b>ยืนยันตัวตน</b><small>Google ของโรงเรียน · LINE · รหัสผ่าน</small></div>
+      <div class="st"><span class="ic c-p"><i class="bi bi-shield-check"></i></span><b>ตรวจสิทธิ์</b><small>เห็นเฉพาะส่วนที่มีสิทธิ์ (ตรวจฝั่งเซิร์ฟเวอร์)</small></div>
+      <div class="st"><span class="ic c-t"><i class="bi bi-cloud-check"></i></span><b>เก็บบนคลาวด์ของโรงเรียน</b><small>Google Cloud / Drive ภายใต้บัญชีโรงเรียน</small></div>
+    </div>
+    <div class="flow-foot">
+      <span class="chip c-y"><i class="bi bi-journal-text"></i>บันทึกการเข้าใช้ทุกครั้ง</span>
+      <span class="chip c-t"><i class="bi bi-arrow-repeat"></i>สำรองข้อมูลทุกคืน</span>
+      <span class="chip c-r"><i class="bi bi-arrow-counterclockwise"></i>ย้อนเวอร์ชันได้เมื่อมีปัญหา</span>
+    </div>
   </div>
 
+  <!-- ใครเห็นอะไร -->
   <div class="card">
-    <h2><i class="bi bi-shield-lock"></i>มาตรการป้องกัน</h2>
-    <ul>
-      <li>ทุกระบบเชื่อมต่อแบบเข้ารหัส (HTTPS) และต้องเข้าสู่ระบบก่อนใช้งาน ด้วยบัญชี Google ของโรงเรียน, LINE, หรือชื่อผู้ใช้และรหัสผ่าน</li>
-      <li>รหัสผ่านเก็บแบบเข้ารหัสทางเดียว (แฮช) ไม่มีใครอ่านรหัสจริงได้ · กรอกรหัสผิดหลายครั้งระบบล็อกชั่วคราว · ลืมรหัสใช้รหัส OTP ที่มีอายุจำกัด</li>
-      <li>ระบบหลัก (เช็คชื่อและคะแนน, หนังสือราชการ, ข้อมูลบุคลากร) บันทึกประวัติการเข้าใช้ ทั้งสำเร็จและไม่สำเร็จ พร้อม IP และอุปกรณ์ เพื่อใช้ตรวจสอบเมื่อพบสิ่งผิดปกติ</li>
-      <li>แบ่งสิทธิ์ตามหน้าที่ เช่น หนังสือลับเห็นเฉพาะผู้รับ ครูเห็นเฉพาะห้องที่สอน ผู้ปกครองเห็นเฉพาะบุตรหลาน</li>
-      <li>การส่งออกข้อมูลบุคลากรต้องยืนยันรหัสผ่านซ้ำ ระบุเหตุผล และถูกบันทึกทุกครั้ง</li>
-      <li>ระบบหลักสำรองข้อมูลอัตโนมัติทุกคืน ทุกระบบย้อนกลับหน้าเว็บเป็นเวอร์ชันก่อนหน้าได้เมื่อเกิดปัญหา</li>
-    </ul>
+    <h2><i class="bi bi-eye"></i>ใครเห็นอะไร</h2>
+    <p class="lead">สิทธิ์แบ่งตามหน้าที่ ไม่ใช่ทุกคนเห็นทุกอย่าง</p>
+    <div class="who">
+      <div class="wh"><div class="wh-h"><span class="ic c-b"><i class="bi bi-person-workspace"></i></span><b>ครู</b></div>
+        <div class="see yes"><i class="bi bi-check-circle-fill"></i>นักเรียนในวิชาและห้องที่สอนหรือดูแล · ข้อมูลของตนเอง · หนังสือที่ส่งถึงตน</div>
+        <div class="see no"><i class="bi bi-x-circle-fill"></i>ข้อมูลส่วนตัวของครูคนอื่น · หนังสือลับที่ไม่ได้ส่งถึง</div></div>
+      <div class="wh"><div class="wh-h"><span class="ic c-g"><i class="bi bi-backpack"></i></span><b>นักเรียน</b></div>
+        <div class="see yes"><i class="bi bi-check-circle-fill"></i>ข้อมูลของตนเองในระบบที่นักเรียนใช้</div>
+        <div class="see no"><i class="bi bi-x-circle-fill"></i>ข้อมูลของนักเรียนคนอื่น · ระบบงานของครู</div></div>
+      <div class="wh"><div class="wh-h"><span class="ic c-y"><i class="bi bi-people"></i></span><b>ผู้ปกครอง</b></div>
+        <div class="see yes"><i class="bi bi-check-circle-fill"></i>เฉพาะบุตรหลานที่ผูกบัญชีไว้ (ยืนยันด้วยเลขประจำตัวนักเรียน + เลขบัตร 4 หลักท้าย)</div>
+        <div class="see no"><i class="bi bi-x-circle-fill"></i>นักเรียนคนอื่น</div></div>
+      <div class="wh"><div class="wh-h"><span class="ic c-p"><i class="bi bi-diagram-3"></i></span><b>ฝ่ายที่ดูแลข้อมูล</b></div>
+        <div class="see yes"><i class="bi bi-check-circle-fill"></i>ข้อมูลที่ฝ่ายรับผิดชอบ เช่น งานบุคคล → ข้อมูลครู · งานทะเบียน → ข้อมูลนักเรียน</div>
+        <div class="see no"><i class="bi bi-x-circle-fill"></i>ส่งออกข้อมูลบุคลากรต้องยืนยันรหัสซ้ำและถูกบันทึก</div></div>
+      <div class="wh"><div class="wh-h"><span class="ic c-r"><i class="bi bi-building"></i></span><b>ผู้บริหาร</b></div>
+        <div class="see yes"><i class="bi bi-check-circle-fill"></i>ข้อมูลตามสายงานและภาพรวมเพื่อการตัดสินใจ</div>
+        <div class="see no"><i class="bi bi-x-circle-fill"></i>รหัสผ่านของใคร (เก็บแบบเข้ารหัสทางเดียว)</div></div>
+      <div class="wh"><div class="wh-h"><span class="ic c-t"><i class="bi bi-tools"></i></span><b>ทีมพัฒนา DSDS</b></div>
+        <div class="see yes"><i class="bi bi-check-circle-fill"></i>ดูแลระบบหลังบ้าน แก้ปัญหา สำรองข้อมูล</div>
+        <div class="see no"><i class="bi bi-x-circle-fill"></i>รหัสผ่านของผู้ใช้ · ไม่นำข้อมูลไปใช้นอกงานของโรงเรียน</div></div>
+    </div>
   </div>
 
+  <!-- ชั้นป้องกัน -->
   <div class="card">
-    <h2><i class="bi bi-grid"></i>รายละเอียดรายระบบ</h2>
-    <div class="grid" id="systems"><p class="muted">กำลังโหลด…</p></div>
+    <h2><i class="bi bi-shield-lock"></i>6 ชั้นป้องกัน</h2>
+    <p class="lead">ออกแบบไว้ล่วงหน้า เพื่อป้องกันและตรวจสอบได้เมื่อมีเหตุ</p>
+    <div class="shield">
+      <div class="sh"><span class="ic c-g"><i class="bi bi-lock"></i></span><div><span class="n">ชั้น 1</span><b>เข้ารหัสระหว่างทาง</b><small>ทุกระบบใช้ HTTPS</small></div></div>
+      <div class="sh"><span class="ic c-y"><i class="bi bi-key"></i></span><div><span class="n">ชั้น 2</span><b>ต้องเข้าสู่ระบบ</b><small>รหัสผ่านเก็บแบบแฮช · ผิดหลายครั้งล็อกชั่วคราว · ลืมรหัสใช้ OTP</small></div></div>
+      <div class="sh"><span class="ic c-p"><i class="bi bi-person-lock"></i></span><div><span class="n">ชั้น 3</span><b>แบ่งสิทธิ์ตามหน้าที่</b><small>หนังสือลับเห็นเฉพาะผู้รับ · ครูเห็นเฉพาะห้องที่สอน</small></div></div>
+      <div class="sh"><span class="ic c-b"><i class="bi bi-journal-text"></i></span><div><span class="n">ชั้น 4</span><b>บันทึกการเข้าใช้</b><small>ระบบหลักเก็บเวลา IP อุปกรณ์ ทั้งสำเร็จและไม่สำเร็จ</small></div></div>
+      <div class="sh"><span class="ic c-r"><i class="bi bi-box-arrow-up"></i></span><div><span class="n">ชั้น 5</span><b>ควบคุมการส่งออก</b><small>ส่งออกข้อมูลบุคลากรต้องยืนยันรหัสซ้ำ ระบุเหตุผล และถูกบันทึก</small></div></div>
+      <div class="sh"><span class="ic c-t"><i class="bi bi-arrow-repeat"></i></span><div><span class="n">ชั้น 6</span><b>สำรองและกู้คืน</b><small>ระบบหลักสำรองทุกคืน · ทุกระบบย้อนเวอร์ชันหน้าเว็บได้</small></div></div>
+    </div>
   </div>
 
+  <!-- ที่เก็บ -->
   <div class="card">
-    <h2><i class="bi bi-person-check"></i>สิทธิ์ของเจ้าของข้อมูล</h2>
-    <p>ครู นักเรียน และผู้ปกครอง ขอดู ขอสำเนา ขอแก้ไขข้อมูลที่ไม่ถูกต้อง ขอให้ลบหรือระงับการใช้ข้อมูล (เท่าที่ไม่ขัดกับหน้าที่ตามกฎหมายของโรงเรียน) และร้องเรียนได้ โดยติดต่อฝ่ายที่ดูแลข้อมูลนั้น หรือติดต่อทีม DSDS</p>
+    <h2><i class="bi bi-hdd-network"></i>ข้อมูลเก็บไว้ที่ไหน</h2>
+    <p class="lead">ทั้งหมดอยู่ภายใต้บัญชีของโรงเรียน</p>
+    <div class="store">
+      <div class="so"><div class="so-h"><span class="ic c-t"><i class="bi bi-database"></i></span><b>Google Firebase / Cloud</b></div>
+        <div class="tags"><span class="tag">เช็คชื่อและคะแนน</span><span class="tag">หนังสือราชการ</span><span class="tag">ข้อมูลบุคลากร</span><span class="tag">แผนปฏิบัติการ</span><span class="tag">งานแนะแนว</span></div>
+        <p>หลังบ้านเข้าได้เฉพาะผู้ดูแลระบบ</p></div>
+      <div class="so"><div class="so-h"><span class="ic c-g"><i class="bi bi-table"></i></span><b>Google Sheets / Drive (Apps Script)</b></div>
+        <div class="tags"><span class="tag">รับสมัครนักเรียน</span><span class="tag">ประเมินครู</span><span class="tag">บัญชีผู้ใช้กลาง</span><span class="tag">บันทึกหนังสือส่ง</span><span class="tag">แบบประเมินการใช้งาน</span></div>
+        <p>ผู้ใช้ไม่เห็นตารางข้อมูลโดยตรง ระบบอ่าน-เขียนแทนตามสิทธิ์</p></div>
+      <div class="so"><div class="so-h"><span class="ic c-y"><i class="bi bi-folder2"></i></span><b>Shared Drive ของโรงเรียน</b></div>
+        <div class="tags"><span class="tag">ไฟล์แนบหนังสือ</span><span class="tag">ไฟล์สำรองข้อมูล</span></div>
+        <p>เฉพาะผู้ได้รับมอบหมายและบัญชีบริการของระบบ</p></div>
+      <div class="so"><div class="so-h"><span class="ic c-b"><i class="bi bi-code-slash"></i></span><b>GitHub Pages / Firebase Hosting</b></div>
+        <div class="tags"><span class="tag">หน้าเว็บของทุกระบบ</span></div>
+        <p>เก็บเฉพาะโค้ดหน้าเว็บ ไม่มีข้อมูลส่วนบุคคล</p></div>
+      <div class="so"><div class="so-h"><span class="ic c-g"><i class="bi bi-line"></i></span><b>LINE Official Account</b></div>
+        <div class="tags"><span class="tag">แจ้งเตือน</span><span class="tag">LINE ถาม-ตอบ</span></div>
+        <p>ใช้เมื่อคุณเชื่อมบัญชี LINE เอง ส่งเฉพาะข้อความที่จำเป็น</p></div>
+      <div class="so"><div class="so-h"><span class="ic c-p"><i class="bi bi-stars"></i></span><b>บริการ AI (Claude ของ Anthropic)</b></div>
+        <div class="tags"><span class="tag">ตอบคำถามใน LINE</span></div>
+        <p>ส่งเฉพาะข้อความคำถาม ไม่ส่งข้อมูลส่วนบุคคลจากฐานข้อมูลของโรงเรียน</p></div>
+    </div>
+  </div>
+
+  <!-- สิทธิ์ -->
+  <div class="card">
+    <h2><i class="bi bi-person-check"></i>สิทธิ์ของคุณ</h2>
+    <div class="rights">
+      <div class="rg"><span class="ic c-b"><i class="bi bi-eye"></i></span>ขอดู</div>
+      <div class="rg"><span class="ic c-t"><i class="bi bi-files"></i></span>ขอสำเนา</div>
+      <div class="rg"><span class="ic c-g"><i class="bi bi-pencil-square"></i></span>ขอแก้ไข</div>
+      <div class="rg"><span class="ic c-y"><i class="bi bi-pause-circle"></i></span>ขอลบหรือระงับ</div>
+      <div class="rg"><span class="ic c-r"><i class="bi bi-megaphone"></i></span>ร้องเรียน</div>
+    </div>
+    <p class="muted">ขอลบหรือระงับได้เท่าที่ไม่ขัดกับหน้าที่ตามกฎหมายของโรงเรียน · ติดต่อฝ่ายที่ดูแลข้อมูลนั้น หรือทีม DSDS</p>
     <p><a class="pill" href="https://pcschool-dev.github.io/dsds/line.html" target="_blank" rel="noopener"><i class="bi bi-line"></i>ติดต่อทีม DSDS</a></p>
   </div>
+
+  <!-- รายละเอียดรายระบบ -->
+  <div class="card">
+    <details class="more">
+      <summary><i class="bi bi-grid" style="color:var(--brand)"></i>รายละเอียดรายระบบ<i class="bi bi-chevron-down"></i></summary>
+      <div class="grid" id="systems"><p class="muted">กำลังโหลด…</p></div>
+    </details>
+  </div>
+  <p class="muted" style="text-align:center">ทุกระบบแสดงการแจ้งนี้ครั้งแรกที่เข้าใช้ และเปิดอ่านซ้ำได้ที่เมนู ☰ › ความเป็นส่วนตัวและข้อมูล</p>
 </div>
 <script src="privacy.js"></script>
 <script>
@@ -105,7 +249,7 @@
   function row(t, v) { return '<div class="row"><b>' + t + '</b>' + (Array.isArray(v) ? '<ul>' + v.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : esc(v)) + '</div>'; }
   box.innerHTML = Object.keys(S).map(function (k) {
     var s = S[k];
-    return '<div class="card sys"><h3><span><i class="bi bi-shield-check"></i></span>' + esc(s.name) + '</h3>' +
+    return '<div class="sys"><h3><i class="bi bi-shield-check"></i>' + esc(s.name) + '</h3>' +
       row('ข้อมูลที่เก็บ', s.data) + row('ใช้ทำอะไร', s.use) + row('เก็บที่ไหน', s.where) +
       row('ใครเห็นได้', s.who) + row('เก็บนานเท่าไร', s.keep) + row('ฝ่ายที่ดูแลข้อมูล', s.owner) + '</div>';
   }).join('');
