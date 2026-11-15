@@ -3,34 +3,45 @@
  * https://pcschool-dev.github.io/dsds/survey.js
  *
  * ปกติไม่ต้องใส่เอง: sysmenu.js (1.6.0+) นับวันที่ผู้ใช้เปิดระบบไว้ในเครื่อง แล้วโหลดไฟล์นี้เมื่อถึงรอบ
- *   - ถามครั้งแรกเมื่อเปิดระบบนั้นมาแล้ว 3 วัน (ไม่นับวันซ้ำ) จากนั้นถามซ้ำทุก 60 วัน ; กด "ไว้ทีหลัง" = ถามใหม่ใน 7 วัน
+ *   - ถามครั้งแรกเมื่อเปิดระบบนั้นมาแล้ว 3 วัน (ไม่นับวันซ้ำ) จากนั้นถามซ้ำทุก 60 วัน ; กด "ไว้ทีหลัง" = ถามใหม่ใน 7 วัน (ตั้งใหม่ได้ในหน้าแอดมิน)
  *   - ไม่ขึ้นทับหน้าต่างอื่นของระบบ และไม่ขึ้นก่อนผู้ใช้กดรับทราบการแจ้งข้อมูลส่วนบุคคล
  * ปิดในระบบหนึ่ง: <script src=".../sysmenu.js" data-survey="off"> ; เปิดเองจากโค้ด: DSDSSurvey.open('doc')
  *
- * คำตอบส่งเข้า Google Form ของโรงเรียน (FORM ข้างล่าง) ไม่ใช้ฐานข้อมูลของระบบใด ดูสรุปผลได้ที่แท็บ "คำตอบ" ของฟอร์ม
- * FORM.id ว่าง = ปิดแบบประเมินทั้งหมด (ยังไม่ถามใคร)
- * ไม่ส่งชื่อ อีเมล หรือข้อมูลระบุตัวตน — ส่งเฉพาะ รหัสระบบ บทบาท (ครู/นักเรียน ถ้าระบบบอก) คะแนน คำตอบ และข้อเสนอแนะที่พิมพ์เอง
+ * คำถามและคำตอบอยู่ที่ Apps Script "ระบบประเมินการใช้งาน DSDS" (ENDPOINT) + ชีตของโรงเรียน ไม่ใช้ฐานข้อมูลของระบบใด
+ *   แก้คำถาม (ชุดกลาง * หรือเฉพาะระบบ) ตั้งรอบการถาม และดูสรุปผล: ENDPOINT?page=admin
+ * ENDPOINT ว่าง = ปิดแบบประเมินทั้งหมด
+ * ไม่ส่งชื่อ อีเมล หรือข้อมูลระบุตัวตน — ส่งเฉพาะ รหัสระบบ บทบาท (ถ้าระบบบอก) รหัสสุ่มของเครื่อง และคำตอบ
  */
 (function () {
   'use strict';
   if (window.DSDSSurvey) return;
 
-  // ===== ตั้งค่า Google Form =====
-  // id = ส่วน /forms/d/e/<id>/ ของลิงก์ฟอร์ม ; entry = เลข entry.xxxx ของแต่ละช่อง (ดูจาก "รับลิงก์ที่กรอกข้อมูลไว้ล่วงหน้า")
-  var FORM = {
-    id: '',
-    entry: { sys: '', role: '', score: '', again: '', note: '' }
-  };
-  var AGAIN = ['ใช้ต่อแน่นอน', 'อาจจะใช้', 'ไม่ใช้ ถ้าไม่บังคับ'];
-  var FACES = [['bi-emoji-frown', 'แย่'], ['bi-emoji-expressionless', 'พอใช้'], ['bi-emoji-neutral', 'ปานกลาง'], ['bi-emoji-smile', 'ดี'], ['bi-emoji-heart-eyes', 'ดีมาก']];
+  // ===== ตัวรับคำตอบ: Apps Script "ระบบประเมินการใช้งาน DSDS" (แก้คำถาม/ดูผลที่ ENDPOINT?page=admin) =====
+  var ENDPOINT = '';   // ลิงก์ /exec ของ web app ; ว่าง = ปิดแบบประเมินทั้งหมด
   var ICONS_CSS = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
-  var KEY = 'dsds.survey.';   // + รหัสระบบ -> { next: เวลาที่ถามได้อีกครั้ง (ms) }
-  var DAY = 864e5, AGAIN_DAYS = 60, LATER_DAYS = 7;
+  var KEY = 'dsds.survey.';   // + รหัสระบบ -> { next: เวลาที่ถามได้อีกครั้ง (ms) } ; dsds.survey.cfg = ค่าตั้งล่าสุดจากชีต (sysmenu ใช้)
+  var DAY = 864e5, FACE_IC = ['bi-emoji-frown', 'bi-emoji-expressionless', 'bi-emoji-neutral', 'bi-emoji-smile', 'bi-emoji-heart-eyes'];
 
-  function ready() { return !!(FORM.id && FORM.entry.score && FORM.entry.again); }
+  function ready() { return /^https:\/\/script\.google\.com\/.+\/exec$/.test(ENDPOINT); }
   function get(id) { try { return JSON.parse(localStorage.getItem(KEY + (id || '_')) || 'null') || {}; } catch (e) { return {}; } }
   function put(id, v) { try { localStorage.setItem(KEY + (id || '_'), JSON.stringify(v)); } catch (e) {} }
   function due(id) { return ready() && (get(id).next || 0) <= Date.now(); }
+  function cid() {   // รหัสสุ่มประจำเครื่อง ใช้นับจำนวนคนตอบโดยไม่รู้ว่าเป็นใคร
+    var k = KEY + 'cid', v = null; try { v = localStorage.getItem(k); } catch (e) {}
+    if (!v) { v = (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).slice(0, 20); try { localStorage.setItem(k, v); } catch (e) {} }
+    return v;
+  }
+  // JSONP (ใช้ได้ทั้งหน้า Firebase/GitHub และหน้าใน iframe ของ Apps Script)
+  var seq = 0;
+  function jsonp(params, done) {
+    var cb = '__dsdsSv' + (++seq) + Date.now().toString(36), sc = document.createElement('script'), fin = false;
+    function end(v) { if (fin) return; fin = true; try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc.parentNode) sc.parentNode.removeChild(sc); done(v); }
+    window[cb] = function (d) { end(d); };
+    var q = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+    sc.src = ENDPOINT + '?' + q + '&cb=' + cb; sc.onerror = function () { end(null); };
+    setTimeout(function () { end(null); }, 20000);
+    document.head.appendChild(sc);
+  }
 
   var D = 'html[data-theme="dark"] ', B = 'html[data-bs-theme="dark"] ';
   function dk(sel, rule) { return sel.split(',').map(function (s) { s = s.trim(); return D + s + ', ' + B + s; }).join(', ') + ' { ' + rule + ' }'; }
@@ -45,6 +56,9 @@
     '.dss-x:hover, .dss-x:focus-visible { background: #f1f5f9; color: #0f172a; outline: none; }',
     '.dss-k { font-size: .75rem; color: #64748b; margin: 0 36px 2px 0; }',
     '.dss-nw { white-space: nowrap; }',
+    '.dss-body { max-height: min(60vh, 520px); overflow-y: auto; overscroll-behavior: contain; margin-right: -6px; padding-right: 6px; }',
+    '.dss-qb + .dss-qb { margin-top: 12px; }',
+    '.dss-opt-l { font-weight: 400; font-size: .78rem; color: #94a3b8; }',
     '.dss-q { font-size: .95rem; font-weight: 700; margin: 0 0 10px; padding-right: 30px; }',
     '.dss-faces { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 4px; }',
     '.dss-face { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff;',
@@ -56,8 +70,7 @@
     '.dss-opt { min-height: 38px; padding: 0 14px; border: 1px solid #e2e8f0; border-radius: 999px; background: #fff; color: #0f172a; font: inherit; font-size: .85rem; cursor: pointer; }',
     '.dss-opt:hover, .dss-opt:focus-visible { border-color: #e6b3bc; outline: none; }',
     '.dss-opt.is-on { border-color: ' + BRAND + '; background: #fbeef0; color: ' + BRAND + '; font-weight: 700; }',
-    '.dss-step2 { margin-top: 12px; }',
-    '.dss-note { width: 100%; margin-top: 10px; min-height: 40px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 12px; font: inherit; font-size: .85rem; resize: vertical; background: #fff; color: inherit; }',
+        '.dss-note { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 12px; font: inherit; font-size: .85rem; resize: vertical; background: #fff; color: inherit; }',
     '.dss-act { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }',
     '.dss-btn { min-height: 38px; padding: 0 18px; border-radius: 999px; font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #0f172a; }',
     '.dss-btn.is-main { background: ' + BRAND + '; border-color: ' + BRAND + '; color: #fff; }',
@@ -101,19 +114,6 @@
     return false;
   }
 
-  function send(o) {
-    var f = new URLSearchParams(), E = FORM.entry;
-    if (E.sys) f.append('entry.' + E.sys, o.sys);
-    if (E.role) f.append('entry.' + E.role, o.role || '-');
-    f.append('entry.' + E.score, String(o.score));
-    f.append('entry.' + E.again, o.again);
-    if (E.note && o.note) f.append('entry.' + E.note, o.note.slice(0, 1000));
-    // Google Form ไม่ตอบกลับข้ามโดเมน -> no-cors (ส่งได้แต่อ่านผลไม่ได้)
-    try {
-      return fetch('https://docs.google.com/forms/d/e/' + encodeURIComponent(FORM.id) + '/formResponse', { method: 'POST', mode: 'no-cors', body: f });
-    } catch (e) { return Promise.reject(e); }
-  }
-
   var card = null, watch = null, waitN = 0;
   function remove() {
     if (watch) { clearInterval(watch); watch = null; }
@@ -122,41 +122,63 @@
     c.classList.remove('is-in');
     setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 250);
   }
-  function later(id) { put(id, { next: Date.now() + LATER_DAYS * DAY }); remove(); }
+  var CFG = { first: 3, repeat: 60, later: 7 };
+  function later(id) { put(id, { next: Date.now() + CFG.later * DAY }); remove(); }
 
+  // ดึงชุดคำถาม (เบื้องหลัง) -> ได้แล้วค่อยขึ้นการ์ด ผู้ใช้ไม่ต้องรอ
   function open(id, role, force) {
     id = String(id || '_');
     if (card || !ready()) return false;
-    if (!force && busy()) { if (waitN++ < 200) setTimeout(function () { open(id, role); }, 1500); return false; }
+    jsonp({ a: 'q', sys: id }, function (d) {
+      if (!d || !d.ok || !d.qs || !d.qs.length) return;
+      if (d.cfg) { CFG = { first: +d.cfg.first || 3, repeat: +d.cfg.repeat || 60, later: +d.cfg.later || 7 }; try { localStorage.setItem(KEY + 'cfg', JSON.stringify(CFG)); } catch (e) {} }
+      show(id, role, d.qs, force);
+    });
+    return true;
+  }
+  function qHtml(q, i) {
+    var h = '<div class="dss-qb" data-q="' + i + '"><div class="dss-q">' + esc(q.text) + (q.req ? '' : ' <span class="dss-opt-l">(ไม่บังคับ)</span>') + '</div>';
+    if (q.type === 'scale') {
+      var lb = q.opts && q.opts.length === 5 ? q.opts : ['แย่', 'พอใช้', 'ปานกลาง', 'ดี', 'ดีมาก'];
+      h += '<div class="dss-faces">' + lb.map(function (l, k) { return '<button type="button" class="dss-face" data-v="' + (k + 1) + '" aria-pressed="false"><i class="bi ' + FACE_IC[k] + '" aria-hidden="true"></i>' + esc(l) + '</button>'; }).join('') + '</div>';
+    } else if (q.type === 'choice') {
+      h += '<div class="dss-opts">' + (q.opts || []).map(function (o) { return '<button type="button" class="dss-opt" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + '</button>'; }).join('') + '</div>';
+    } else {
+      h += '<textarea class="dss-note" rows="1" maxlength="1000" placeholder="พิมพ์คำตอบ"></textarea>';
+    }
+    return h + '</div>';
+  }
+  function show(id, role, qs, force) {
+    if (card) return;
+    if (!force && busy()) { if (waitN++ < 200) setTimeout(function () { show(id, role, qs); }, 1500); return; }
     ensureStyle();
-    var st = { score: 0, again: '' };
+    var ans = {};
     card = document.createElement('div'); card.className = 'dss-card dsm-ext'; card.setAttribute('role', 'region'); card.setAttribute('aria-label', 'แบบประเมินการใช้งาน');
     card.innerHTML = '<button type="button" class="dss-x" data-dss="later" aria-label="ไว้ทีหลัง"><i class="bi bi-x-lg"></i></button>' +
-      '<div class="dss-k"><span class="dss-nw">ช่วยเราปรับปรุง ' + esc(sysName(id)) + '</span> · <span class="dss-nw">2 คำถาม ไม่ระบุชื่อ</span></div>' +
-      '<div class="dss-q">ระบบนี้ช่วยให้งานของคุณง่ายขึ้นแค่ไหน</div>' +
-      '<div class="dss-faces">' + FACES.map(function (f, i) {
-        return '<button type="button" class="dss-face" data-score="' + (i + 1) + '" aria-pressed="false"><i class="bi ' + f[0] + '" aria-hidden="true"></i>' + f[1] + '</button>';
-      }).join('') + '</div>' +
-      '<div class="dss-step2"><div class="dss-q">ถ้าไม่บังคับใช้ คุณจะยังใช้ระบบนี้ต่อไหม</div>' +
-      '<div class="dss-opts">' + AGAIN.map(function (a) { return '<button type="button" class="dss-opt" data-again="' + esc(a) + '" aria-pressed="false">' + esc(a) + '</button>'; }).join('') + '</div>' +
-      '<textarea class="dss-note" rows="1" maxlength="1000" placeholder="อยากให้ปรับอะไร (ไม่บังคับ)"></textarea></div>' +
+      '<div class="dss-k"><span class="dss-nw">ช่วยเราปรับปรุง ' + esc(sysName(id)) + '</span> · <span class="dss-nw">' + qs.length + ' คำถาม ไม่ระบุชื่อ</span></div>' +
+      '<div class="dss-body">' + qs.map(qHtml).join('') + '</div>' +
       '<div class="dss-act"><button type="button" class="dss-btn" data-dss="later">ไว้ทีหลัง</button>' +
       '<button type="button" class="dss-btn is-main" data-dss="send" disabled>ส่ง</button></div>';
     function sync() {
-      card.querySelectorAll('[data-score]').forEach(function (b) { var on = +b.getAttribute('data-score') === st.score; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); });
-      card.querySelectorAll('[data-again]').forEach(function (b) { var on = b.getAttribute('data-again') === st.again; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); });
-      card.querySelector('[data-dss="send"]').disabled = !(st.score && st.again);
+      card.querySelectorAll('.dss-qb').forEach(function (b) {
+        var q = qs[+b.getAttribute('data-q')];
+        b.querySelectorAll('[data-v]').forEach(function (x) { var on = String(ans[q.id]) === x.getAttribute('data-v'); x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on); });
+      });
+      card.querySelector('[data-dss="send"]').disabled = !qs.every(function (q) { return !q.req || (ans[q.id] != null && String(ans[q.id]).trim() !== ''); });
     }
+    card.addEventListener('input', function (e) {
+      var b = e.target.closest('.dss-qb'); if (!b) return;
+      ans[qs[+b.getAttribute('data-q')].id] = e.target.value.trim(); sync();
+    });
     card.addEventListener('click', function (e) {
       var t = e.target.closest && e.target.closest('button'); if (!t || !card) return;
-      if (t.hasAttribute('data-score')) { st.score = +t.getAttribute('data-score'); sync(); return; }
-      if (t.hasAttribute('data-again')) { st.again = t.getAttribute('data-again'); sync(); return; }
+      var b = t.closest('.dss-qb');
+      if (b && t.hasAttribute('data-v')) { var q = qs[+b.getAttribute('data-q')]; ans[q.id] = q.type === 'scale' ? +t.getAttribute('data-v') : t.getAttribute('data-v'); sync(); return; }
       var k = t.getAttribute('data-dss');
       if (k === 'later') { later(id); return; }
-      if (k === 'send' && st.score && st.again) {
-        var note = (card.querySelector('.dss-note').value || '').trim();
-        put(id, { next: Date.now() + AGAIN_DAYS * DAY, last: Date.now() });
-        send({ sys: id, role: role, score: st.score, again: st.again, note: note }).catch(function () {});
+      if (k === 'send' && !t.disabled) {
+        put(id, { next: Date.now() + CFG.repeat * DAY, last: Date.now() });
+        jsonp({ a: 's', sys: id, role: role || '-', cid: cid(), ans: JSON.stringify(ans) }, function () {});
         card.innerHTML = '<div class="dss-thanks"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>ขอบคุณครับ คำตอบของคุณช่วยให้ระบบดีขึ้น</div>';
         setTimeout(remove, 2200);
       }
@@ -164,12 +186,11 @@
     (document.body || document.documentElement).appendChild(card);
     requestAnimationFrame(function () { requestAnimationFrame(function () { if (card) card.classList.add('is-in'); }); });
     watch = setInterval(function () { if (card) card.style.visibility = busy() ? 'hidden' : ''; }, 1500);
-    return true;
   }
 
   window.DSDSSurvey = {
     open: function (id, role) { return open(id, role, true); },
     maybe: function (id, role) { return due(id) ? open(id, role) : false; },
-    due: due, ready: ready, version: '1.0.0'
+    due: due, ready: ready, version: '1.1.0'
   };
 })();

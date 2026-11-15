@@ -20,7 +20,7 @@
  * กล่องเกี่ยวกับ/ติดต่องาน DSDS (about.js): ปุ่มท้ายแผงมีให้เอง ; เปิดจากโค้ด DSDSMenu.about() — แถวสถานะ LINE ต่อระบบ ดูหัว about.js
  * ความเป็นส่วนตัวและข้อมูล (privacy.js, 1.6.0): ปุ่มท้ายแผง + การ์ดแจ้งครั้งแรกต่อระบบ (ตามรหัส data-current) ; เปิดจากโค้ด DSDSMenu.privacy()
  *   data-privacy  "off" = ไม่แสดงการ์ดแจ้งครั้งแรก (ระบบที่มีหน้ายินยอมของตัวเองแล้ว) ปุ่มท้ายแผงยังอยู่
- * แบบประเมินการใช้งาน 2 คำถาม (survey.js, 1.6.0): นับวันที่เปิดระบบไว้ในเครื่อง ครบ 3 วันจึงถาม ถามซ้ำทุก 60 วัน ; ปิด: data-survey="off"
+ * แบบประเมินการใช้งาน (survey.js, 1.6.0): นับวันที่เปิดระบบไว้ในเครื่อง ครบ 3 วันจึงถาม ถามซ้ำทุก 60 วัน (คำถาม/รอบ แก้ได้ในหน้าแอดมินแบบประเมิน) ; ปิด: data-survey="off"
  *
  *   data-audience "student" = ผู้ใช้เป็นนักเรียน -> เห็นเฉพาะระบบที่คอลัมน์ "ผู้ใช้" ในชีตเป็น นักเรียน หรือ ทุกคน (เว้นว่าง = ทุกคน)
  *                 (หรือเรียก DSDSMenu.setAudience('student') หลังล็อกอิน; 'teacher' หรือไม่ระบุ = เห็นครบ) — แค่จัดเมนู ไม่ใช่การกันสิทธิ์
@@ -316,8 +316,10 @@
       if (u.d !== t) { u.d = t; u.n = (u.n || 0) + 1; localStorage.setItem('dsds.use.' + id, JSON.stringify(u)); }
       if (opt('privacy', '') !== 'off' && localStorage.getItem('dsds.pdpa.' + id) !== PRIV_VER) return;
       nx = (JSON.parse(localStorage.getItem('dsds.survey.' + id) || 'null') || {}).next || 0;
+      var first = (JSON.parse(localStorage.getItem('dsds.survey.cfg') || 'null') || {}).first;   // ค่าตั้งจากหน้าแอดมิน (survey.js จำไว้)
+      first = first >= 0 ? first : 3;
     } catch (e) { return; }
-    if (u.n < 3 || nx > Date.now()) return;
+    if (u.n < first || nx > Date.now()) return;
     setTimeout(function () {
       if (window.DSDSSurvey) { window.DSDSSurvey.maybe(id, AUDIENCE); return; }
       var sc = document.createElement('script'); sc.src = SURVEY_SRC + '?v=' + Math.floor(Date.now() / 36e5);
