@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ความเป็นส่วนตัวและความปลอดภัยข้อมูล · โรงเรียนปากช่อง</title>
+<meta name="description" content="ข้อมูลในระบบดิจิทัลของโรงเรียนปากช่อง เก็บที่ไหน ใครเข้าถึงได้ และป้องกันอย่างไร">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+  :root { --bg: #f4f5f8; --card: #fff; --ink: #0f172a; --mute: #64748b; --line: #e7eaf0; --brand: #8a2432; --soft: #fbeef0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f131a; --card: #171c25; --ink: #e8effc; --mute: #9aa6b8; --line: #252c38; --brand: #e58a9b; --soft: #3a1d24; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Sarabun', system-ui, sans-serif; font-size: 16px; line-height: 1.65; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  header img { width: 52px; height: 52px; border-radius: 50%; background: #fff; flex: none; }
+  h1 { font-size: clamp(1.25rem, 4vw, 1.6rem); margin: 0; line-height: 1.3; }
+  .sub { color: var(--mute); font-size: .92rem; }
+  .card { background: var(--card); border-radius: 18px; box-shadow: 0 2px 10px rgba(15,23,42,.06); padding: 18px 20px; margin-bottom: 14px; }
+  h2 { font-size: 1.1rem; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  h2 i { color: var(--brand); }
+  p { margin: 0 0 8px; }
+  ul { margin: 0; padding-left: 1.2em; }
+  li { margin: 2px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; align-items: stretch; }
+  .sys { display: flex; flex-direction: column; height: 100%; margin: 0; }
+  .sys h3 { margin: 0 0 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .sys h3 span { flex: none; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--soft); color: var(--brand); }
+  .row { padding: 6px 0; border-top: 1px solid var(--line); font-size: .9rem; }
+  .row b { display: block; font-size: .78rem; color: var(--mute); font-weight: 600; }
+  .row ul { padding-left: 1.1em; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 999px; background: var(--brand); color: #fff; text-decoration: none; font-weight: 600; }
+  .muted { color: var(--mute); font-size: .85rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .8rem; color: var(--mute); font-weight: 600; border-top: 0; }
+  .tbl { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="https://lh5.googleusercontent.com/d/1Q28ttbihnvUUF-kEBwdEj04kVyQ8h0n-" alt="">
+    <div>
+      <h1>ความเป็นส่วนตัวและความปลอดภัยข้อมูล</h1>
+      <div class="sub">ระบบดิจิทัลโรงเรียนปากช่อง · งานพัฒนาและบริการระบบดิจิทัล (DSDS) · ปรับปรุงล่าสุด 15 พฤศจิกายน 2569</div>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2><i class="bi bi-bank"></i>หลักการ</h2>
+    <p>โรงเรียนเก็บและใช้ข้อมูลส่วนบุคคลของครู นักเรียน และผู้ปกครอง เพื่อปฏิบัติหน้าที่ตามภารกิจของรัฐ (พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 มาตรา 24(4)) เก็บเท่าที่จำเป็น ไม่ขาย ไม่ใช้เพื่อการค้า และให้ฝ่ายที่รับผิดชอบข้อมูลแต่ละเรื่องเป็นผู้ดูแลความถูกต้อง</p>
+    <p class="muted">ทุกระบบแสดงการแจ้งนี้ครั้งแรกที่เข้าใช้ และเปิดอ่านซ้ำได้ที่เมนู ☰ › ความเป็นส่วนตัวและข้อมูล</p>
+  </div>
+
+  <div class="card">
+    <h2><i class="bi bi-cloud-check"></i>ข้อมูลเก็บที่ไหน ใครเข้าถึงได้</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>ที่เก็บข้อมูล</th><th>ใช้กับ</th><th>ใครเข้าถึงได้ และอย่างไร</th></tr></thead>
+      <tbody>
+        <tr><td>Google Firebase / Google Cloud (โปรเจกต์ของโรงเรียน)</td><td>ระบบเช็คชื่อและคะแนน, รับหนังสือราชการ, ข้อมูลบุคลากร, ระบบแผน, ระบบงานแนะแนว</td><td>ผู้ใช้เข้าผ่านหน้าเว็บหลังเข้าสู่ระบบ เห็นเฉพาะข้อมูลตามสิทธิ์ (กำหนดด้วยกฎความปลอดภัยฝั่งเซิร์ฟเวอร์) · หลังบ้านเข้าได้เฉพาะผู้ดูแลระบบของทีม DSDS</td></tr>
+        <tr><td>Google Sheets / Drive (บัญชีโรงเรียน) ผ่าน Google Apps Script</td><td>รับสมัครนักเรียน, ประเมินครู, บัญชีผู้ใช้กลาง, บันทึกหนังสือส่ง, LINE ถาม-ตอบ</td><td>ผู้ใช้ทั่วไปไม่เห็นตารางข้อมูลโดยตรง ระบบอ่าน-เขียนแทนตามสิทธิ์ · ไฟล์ข้อมูลแชร์เฉพาะผู้รับผิดชอบงานและผู้ดูแลระบบ</td></tr>
+        <tr><td>Google Shared Drive ของโรงเรียน</td><td>ไฟล์แนบหนังสือราชการ, ไฟล์สำรองข้อมูล</td><td>สมาชิก Shared Drive ที่ได้รับมอบหมาย และบัญชีบริการของระบบ</td></tr>
+        <tr><td>GitHub Pages / Firebase Hosting</td><td>ตัวหน้าเว็บ (โค้ด) ของทุกระบบ</td><td>เก็บเฉพาะโค้ดหน้าเว็บ ไม่มีข้อมูลส่วนบุคคล</td></tr>
+        <tr><td>LINE Official Account</td><td>แจ้งเตือนและ LINE ถาม-ตอบ</td><td>ใช้เมื่อผู้ใช้เชื่อมบัญชี LINE เอง · ส่งเฉพาะข้อความแจ้งเตือนที่จำเป็น</td></tr>
+        <tr><td>บริการ AI (Claude ของ Anthropic)</td><td>ตอบคำถามนักเรียนใน LINE ถาม-ตอบ</td><td>ส่งเฉพาะข้อความคำถาม ไม่ส่งข้อมูลบุคลากรหรือข้อมูลส่วนบุคคลจากฐานข้อมูลของโรงเรียน</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h2><i class="bi bi-shield-lock"></i>มาตรการป้องกัน</h2>
+    <ul>
+      <li>ทุกระบบเชื่อมต่อแบบเข้ารหัส (HTTPS) และต้องเข้าสู่ระบบก่อนใช้งาน ด้วยบัญชี Google ของโรงเรียน, LINE, หรือชื่อผู้ใช้และรหัสผ่าน</li>
+      <li>รหัสผ่านเก็บแบบเข้ารหัสทางเดียว (แฮช) ไม่มีใครอ่านรหัสจริงได้ · กรอกรหัสผิดหลายครั้งระบบล็อกชั่วคราว · ลืมรหัสใช้รหัส OTP ที่มีอายุจำกัด</li>
+      <li>ระบบหลัก (เช็คชื่อและคะแนน, หนังสือราชการ, ข้อมูลบุคลากร) บันทึกประวัติการเข้าใช้ ทั้งสำเร็จและไม่สำเร็จ พร้อม IP และอุปกรณ์ เพื่อใช้ตรวจสอบเมื่อพบสิ่งผิดปกติ</li>
+      <li>แบ่งสิทธิ์ตามหน้าที่ เช่น หนังสือลับเห็นเฉพาะผู้รับ ครูเห็นเฉพาะห้องที่สอน ผู้ปกครองเห็นเฉพาะบุตรหลาน</li>
+      <li>การส่งออกข้อมูลบุคลากรต้องยืนยันรหัสผ่านซ้ำ ระบุเหตุผล และถูกบันทึกทุกครั้ง</li>
+      <li>ระบบหลักสำรองข้อมูลอัตโนมัติทุกคืน ทุกระบบย้อนกลับหน้าเว็บเป็นเวอร์ชันก่อนหน้าได้เมื่อเกิดปัญหา</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><i class="bi bi-grid"></i>รายละเอียดรายระบบ</h2>
+    <div class="grid" id="systems"><p class="muted">กำลังโหลด…</p></div>
+  </div>
+
+  <div class="card">
+    <h2><i class="bi bi-person-check"></i>สิทธิ์ของเจ้าของข้อมูล</h2>
+    <p>ครู นักเรียน และผู้ปกครอง ขอดู ขอสำเนา ขอแก้ไขข้อมูลที่ไม่ถูกต้อง ขอให้ลบหรือระงับการใช้ข้อมูล (เท่าที่ไม่ขัดกับหน้าที่ตามกฎหมายของโรงเรียน) และร้องเรียนได้ โดยติดต่อฝ่ายที่ดูแลข้อมูลนั้น หรือติดต่อทีม DSDS</p>
+    <p><a class="pill" href="https://pcschool-dev.github.io/dsds/line.html" target="_blank" rel="noopener"><i class="bi bi-line"></i>ติดต่อทีม DSDS</a></p>
+  </div>
+</div>
+<script src="privacy.js"></script>
+<script>
+(function () {
+  var box = document.getElementById('systems');
+  if (!window.DSDSPrivacy) { box.innerHTML = '<p class="muted">โหลดรายละเอียดไม่ได้ ลองรีเฟรชหน้านี้</p>'; return; }
+  var S = window.DSDSPrivacy.systems();
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function row(t, v) { return '<div class="row"><b>' + t + '</b>' + (Array.isArray(v) ? '<ul>' + v.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : esc(v)) + '</div>'; }
+  box.innerHTML = Object.keys(S).map(function (k) {
+    var s = S[k];
+    return '<div class="card sys"><h3><span><i class="bi bi-shield-check"></i></span>' + esc(s.name) + '</h3>' +
+      row('ข้อมูลที่เก็บ', s.data) + row('ใช้ทำอะไร', s.use) + row('เก็บที่ไหน', s.where) +
+      row('ใครเห็นได้', s.who) + row('เก็บนานเท่าไร', s.keep) + row('ฝ่ายที่ดูแลข้อมูล', s.owner) + '</div>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

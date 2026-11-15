@@ -18,6 +18,9 @@
  *   data-splash   "off" = ไม่แสดงหน้าสโลแกน DSDS ครั้งแรกของวัน
  *   หลังออกจากระบบ: จับปุ่ม "ออกจากระบบ"/logout ให้เอง (1.5.0) ; ปิดเฉพาะส่วนนี้ data-splash-logout="off" ; เรียกเองได้ DSDSMenu.splash()
  * กล่องเกี่ยวกับ/ติดต่องาน DSDS (about.js): ปุ่มท้ายแผงมีให้เอง ; เปิดจากโค้ด DSDSMenu.about() — แถวสถานะ LINE ต่อระบบ ดูหัว about.js
+ * ความเป็นส่วนตัวและข้อมูล (privacy.js, 1.6.0): ปุ่มท้ายแผง + การ์ดแจ้งครั้งแรกต่อระบบ (ตามรหัส data-current) ; เปิดจากโค้ด DSDSMenu.privacy()
+ *   data-privacy  "off" = ไม่แสดงการ์ดแจ้งครั้งแรก (ระบบที่มีหน้ายินยอมของตัวเองแล้ว) ปุ่มท้ายแผงยังอยู่
+ * แบบประเมินการใช้งาน 2 คำถาม (survey.js, 1.6.0): นับวันที่เปิดระบบไว้ในเครื่อง ครบ 3 วันจึงถาม ถามซ้ำทุก 60 วัน ; ปิด: data-survey="off"
  *
  *   data-audience "student" = ผู้ใช้เป็นนักเรียน -> เห็นเฉพาะระบบที่คอลัมน์ "ผู้ใช้" ในชีตเป็น นักเรียน หรือ ทุกคน (เว้นว่าง = ทุกคน)
  *                 (หรือเรียก DSDSMenu.setAudience('student') หลังล็อกอิน; 'teacher' หรือไม่ระบุ = เห็นครบ) — แค่จัดเมนู ไม่ใช่การกันสิทธิ์
@@ -149,6 +152,7 @@
     '  border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; color: #0f172a; font: inherit; font-size: .84rem; font-weight: 600; cursor: pointer; }',
     '.dsm-about:hover, .dsm-about:focus-visible { background: #eff6ff; border-color: #bfdbfe; outline: none; }',
     '.dsm-about .bi-line { color: #06c755; font-size: 1.05rem; }',
+    '.dsm-about .bi-shield-check { color: #8a2432; font-size: 1rem; }',
     '.dsm-fab { position: fixed; z-index: 2147482000; width: 42px; height: 42px; padding: 0; margin: 0; border-radius: 13px; cursor: pointer;',
     '  border: 1.5px solid rgba(255,255,255,.9); background: var(--dsm-grad); color: #fff; font-size: 1.4rem; line-height: 1;',
     '  display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(15,23,42,.25); transition: transform .12s, box-shadow .15s; }',
@@ -187,6 +191,7 @@
     'html[data-theme="dark"] .dsm-foot, html[data-bs-theme="dark"] .dsm-foot { background: #1b212b; border-top-color: #2a3240; color: #7f8da1; }',
     'html[data-theme="dark"] .dsm-about, html[data-bs-theme="dark"] .dsm-about { background: #10151e; border-color: #2a3240; color: #e6ebf3; }',
     'html[data-theme="dark"] .dsm-about:hover, html[data-bs-theme="dark"] .dsm-about:hover { background: #222a36; }',
+    'html[data-theme="dark"] .dsm-about .bi-shield-check, html[data-bs-theme="dark"] .dsm-about .bi-shield-check { color: #f0a3b0; }',
     'html[data-theme="warm"] .dsm-panel { background: #ede6d8; color: #2f281f; }',
     'html[data-theme="warm"] .dsm-sec { color: #7a6e5f; }',
     'html[data-theme="warm"] .dsm-group { background: #f9f3e8; border-color: #e5dccb; }',
@@ -256,7 +261,8 @@
   function subText() { return DATA.systems.filter(function (s) { return !s.soon && shown(s); }).length + ' ระบบ · ทีม DSDS'; }
   // ปุ่มกล่อง "เกี่ยวกับ/ติดต่องาน DSDS" (about.js โหลดตอนกดครั้งแรก) — ทุกระบบได้กล่องเดียวกันโดยไม่ต้องแก้ระบบ
   function footHtml() {
-    return '<button type="button" class="dsm-about" data-dsds-about-load><i class="bi bi-line" aria-hidden="true"></i>ติดต่อทีมงาน DSDS · ขอความช่วยเหลือ</button>' + (ADMIN ? '<a class="dsm-admin" href="' + SHEET_EDIT + '" target="_blank" rel="noopener"><i class="bi bi-pencil-square"></i>จัดการรายการระบบ (Google Sheet)</a>'
+    return '<button type="button" class="dsm-about" data-dsds-about-load><i class="bi bi-line" aria-hidden="true"></i>ติดต่อทีมงาน DSDS · ขอความช่วยเหลือ</button>' +
+      '<button type="button" class="dsm-about" data-dsds-privacy-load><i class="bi bi-shield-check" aria-hidden="true"></i>ความเป็นส่วนตัวและข้อมูล</button>' + (ADMIN ? '<a class="dsm-admin" href="' + SHEET_EDIT + '" target="_blank" rel="noopener"><i class="bi bi-pencil-square"></i>จัดการรายการระบบ (Google Sheet)</a>'
                  : 'ลิงก์ทุกระบบเปิดในแท็บใหม่');
   }
   var ABOUT_SRC = (me && me.src ? me.src.replace(/sysmenu\.js(\?.*)?$/, 'about.js') : '') || 'https://pcschool-dev.github.io/dsds/about.js';
@@ -272,6 +278,52 @@
   }
   function openAbout() {
     withAbout(function (A) { A.open(); }, function () { window.open('https://pcschool-dev.github.io/dsds/line.html', '_blank', 'noopener'); });
+  }
+  // ===== ความเป็นส่วนตัวและข้อมูล (privacy.js โหลดเมื่อต้องใช้ : ไม่อ่านฐานข้อมูลใด จำการกดรับทราบไว้ในเครื่อง) =====
+  var PRIV_SRC = (me && me.src ? me.src.replace(/sysmenu\.js(\?.*)?$/, 'privacy.js') : '') || 'https://pcschool-dev.github.io/dsds/privacy.js';
+  var PRIV_VER = '2569-1';   // ต้องตรงกับ VERSION ใน privacy.js (ใช้เช็คในเครื่องก่อน จะได้ไม่โหลดไฟล์ถ้าเคยกดรับทราบแล้ว)
+  var privQ = null;
+  function withPrivacy(fn, fail) {
+    if (window.DSDSPrivacy) { fn(window.DSDSPrivacy); return; }
+    if (privQ) { privQ.push(fn); return; }
+    privQ = [fn];
+    var sc = document.createElement('script'); sc.src = PRIV_SRC + '?v=' + Math.floor(Date.now() / 36e5);
+    sc.onload = function () { var q = privQ || []; privQ = null; if (window.DSDSPrivacy) q.forEach(function (f) { f(window.DSDSPrivacy); }); };
+    sc.onerror = function () { privQ = null; if (fail) fail(); };
+    document.head.appendChild(sc);
+  }
+  function openPrivacy() {
+    withPrivacy(function (P) { P.open(CURRENT); }, function () { window.open('https://pcschool-dev.github.io/dsds/privacy.html', '_blank', 'noopener'); });
+  }
+  // การ์ดแจ้งครั้งแรก: รอให้หน้าสโลแกนหายก่อน แล้วค่อยโชว์ (ไม่ทับกัน)
+  function privacyNotice() {
+    if (opt('privacy', '') === 'off') return;
+    var k = null; try { k = localStorage.getItem('dsds.pdpa.' + (CURRENT || '_')); } catch (e) { return; }
+    if (k === PRIV_VER) return;
+    var tries = 0;
+    (function wait() {
+      if (document.querySelector('.dsa-splash') && tries++ < 20) { setTimeout(wait, 500); return; }
+      withPrivacy(function (P) { P.notice(CURRENT); });
+    })();
+  }
+  // ===== แบบประเมินการใช้งาน: นับวันที่เปิดระบบ (เครื่องนี้) -> ครบ 3 วัน + รับทราบการแจ้งข้อมูลแล้ว + ถึงรอบ -> โหลด survey.js =====
+  var SURVEY_SRC = (me && me.src ? me.src.replace(/sysmenu\.js(\?.*)?$/, 'survey.js') : '') || 'https://pcschool-dev.github.io/dsds/survey.js';
+  function surveyCheck() {
+    if (opt('survey', '') === 'off') return;
+    var id = CURRENT || '_', d = new Date(), t = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(), u, nx;
+    try {
+      u = JSON.parse(localStorage.getItem('dsds.use.' + id) || 'null') || { n: 0 };
+      if (u.d !== t) { u.d = t; u.n = (u.n || 0) + 1; localStorage.setItem('dsds.use.' + id, JSON.stringify(u)); }
+      if (opt('privacy', '') !== 'off' && localStorage.getItem('dsds.pdpa.' + id) !== PRIV_VER) return;
+      nx = (JSON.parse(localStorage.getItem('dsds.survey.' + id) || 'null') || {}).next || 0;
+    } catch (e) { return; }
+    if (u.n < 3 || nx > Date.now()) return;
+    setTimeout(function () {
+      if (window.DSDSSurvey) { window.DSDSSurvey.maybe(id, AUDIENCE); return; }
+      var sc = document.createElement('script'); sc.src = SURVEY_SRC + '?v=' + Math.floor(Date.now() / 36e5);
+      sc.onload = function () { if (window.DSDSSurvey) window.DSDSSurvey.maybe(id, AUDIENCE); };
+      document.head.appendChild(sc);
+    }, 20000);   // ให้ผู้ใช้เริ่มงานก่อน ไม่ถามทันทีที่เปิด
   }
   // หน้าสโลแกน DSDS: ครั้งแรกของวัน (เช็กวันในเครื่องก่อน ไม่โหลด about.js ถ้าเคยเห็นแล้ว) ; force = หลังออกจากระบบ
   var SPLASH = opt('splash', '') !== 'off' && !(window.DSDS_ABOUT && window.DSDS_ABOUT.splash === false);
@@ -463,6 +515,7 @@
     var b = t.closest('[data-sysmenu], .dsm-fab');
     if (b) { e.preventDefault(); open(b); return; }
     if (t.closest('[data-dsds-about-load]')) { e.preventDefault(); close(); openAbout(); return; }
+    if (t.closest('[data-dsds-privacy-load]')) { e.preventDefault(); close(); openPrivacy(); return; }
     if (t.closest('[data-dsm-close]')) { e.preventDefault(); close(); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
@@ -470,6 +523,8 @@
   function init() {
     ensure();
     splash(logoutCarried());
+    setTimeout(privacyNotice, 1200);
+    surveyCheck();
     refresh(false);
     document.querySelectorAll('[data-sysmenu]').forEach(function (b) {
       b.setAttribute('aria-controls', 'dsmPanel'); b.setAttribute('aria-expanded', 'false');
@@ -489,8 +544,8 @@
     open: function () { open(); }, close: close, refresh: function () { refresh(true); },
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
     setAudience: function (v) { AUDIENCE = audOf(v); rerender(); },
-    about: openAbout, splash: function () { splash(true); },
-    get systems() { return DATA.systems.slice(); }, version: '1.5.0'
+    about: openAbout, privacy: openPrivacy, splash: function () { splash(true); },
+    get systems() { return DATA.systems.slice(); }, version: '1.6.0'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
