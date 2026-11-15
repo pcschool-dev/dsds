@@ -96,14 +96,14 @@
     // ----- หน้าสโลแกน (splash) -----
     '.dsa-splash { position: fixed; inset: 0; z-index: 2147483300; display: flex; flex-direction: column; align-items: center; justify-content: center;',
     '  padding: 24px 20px; text-align: center; font-family: inherit; line-height: 1.4; cursor: pointer; -webkit-tap-highlight-color: transparent;',
-    '  background: radial-gradient(120% 80% at 50% 0%, #e0ebff 0%, #f4f7fd 55%, #ffffff 100%); color: #0f172a; opacity: 1; transition: opacity .6s ease; }',
+    '  background: radial-gradient(120% 80% at 50% 0%, #e0ebff 0%, #f4f7fd 55%, #ffffff 100%); color: #0f172a; opacity: 1; transition: opacity .35s ease; }',
     '.dsa-splash.is-out { opacity: 0; pointer-events: none; }',
-    '.dsa-splash > * { opacity: 0; transform: translateY(8px); animation: dsaUp .55s ease forwards; }',
-    '.dsa-splash .dsa-badge { width: 76px; height: 76px; font-size: 2rem; margin-bottom: 18px; animation-delay: .05s; }',
-    '.dsa-splash .dsa-title { font-size: 1.6rem; max-width: 100%; animation-delay: .18s; }',
-    '.dsa-splash .dsa-sub { font-size: .9rem; max-width: 420px; animation-delay: .28s; }',
-    '.dsa-splash .dsa-vision { max-width: 440px; margin: 20px 0 0; font-size: clamp(1rem, 4.2vw, 1.15rem); animation-delay: .45s; }',
-    '.dsa-skip { position: absolute; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; font-size: .75rem; color: #94a3b8; animation-delay: .9s !important; }',
+    '.dsa-splash > * { opacity: 0; transform: translateY(8px); animation: dsaUp .4s ease forwards; }',
+    '.dsa-splash .dsa-badge { width: 76px; height: 76px; font-size: 2rem; margin-bottom: 18px; animation-delay: 0s; }',
+    '.dsa-splash .dsa-title { font-size: 1.6rem; max-width: 100%; animation-delay: .08s; }',
+    '.dsa-splash .dsa-sub { font-size: .9rem; max-width: 420px; animation-delay: .14s; }',
+    '.dsa-splash .dsa-vision { max-width: 440px; margin: 20px 0 0; font-size: clamp(1rem, 4.2vw, 1.15rem); animation-delay: .22s; }',
+    '.dsa-skip { position: absolute; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; font-size: .75rem; color: #94a3b8; animation-delay: .35s !important; }',
     '@keyframes dsaUp { to { opacity: 1; transform: none; } }',
     '@media (prefers-reduced-motion: reduce) { .dsa-splash > * { animation: none; opacity: 1; transform: none; } .dsa-splash { transition-duration: .2s; } }',
     dk('.dsa-splash', 'background: radial-gradient(120% 80% at 50% 0%, #1c2740 0%, #10151e 60%, #0b0f16 100%); color: #e8effc;'),
@@ -239,14 +239,14 @@
       if (done) return; done = true;
       pend(false);
       el.classList.add('is-out');
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); if (splashEl === el) splashEl = null; }, 650);
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); if (splashEl === el) splashEl = null; }, 400);
     }
     el.addEventListener('click', out);
     document.addEventListener('keydown', function k(e) { document.removeEventListener('keydown', k, true); out(); }, true);
     (document.body || document.documentElement).appendChild(el);
     fitTitle(el.querySelector('.dsa-title'));
-    // นับเวลาหลังหน้าโหลดเสร็จ (หน้า login มาครบอยู่ข้างใต้) ค้างพออ่านสโลแกนจบ แล้วเฟด .6 วิ
-    var hold = Math.max(800, Number(o.ms) || 2800);
+    // นับเวลาหลังหน้าโหลดเสร็จ (หน้า login มาครบอยู่ข้างใต้) ค้างพออ่านสโลแกนจบ แล้วเฟด .35 วิ (รวม ~1.9 วิ, 2026-11-15 ย่อจาก ~3.4 วิ)
+    var hold = Math.max(600, Number(o.ms) || 1500);
     if (document.readyState === 'complete') setTimeout(out, hold);
     else window.addEventListener('load', function () { setTimeout(out, hold); });
     return true;
