@@ -17,7 +17,7 @@
   if (window.DSDSSurvey) return;
 
   // ===== ตัวรับคำตอบ: Apps Script "ระบบประเมินการใช้งาน DSDS" (แก้คำถาม/ดูผลที่ ENDPOINT?page=admin) =====
-  var ENDPOINT = '';   // ลิงก์ /exec ของ web app ; ว่าง = ปิดแบบประเมินทั้งหมด
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxodfuQ_rhYaMsgJoICuPYR-p9h9av2XpOd4xJwkDSOz5l1qn-iuES9hWDhv1Mby5HmvA/exec';   // ลิงก์ /exec ของ web app ; ว่าง = ปิดแบบประเมินทั้งหมด
   var ICONS_CSS = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
   var KEY = 'dsds.survey.';   // + รหัสระบบ -> { next: เวลาที่ถามได้อีกครั้ง (ms) } ; dsds.survey.cfg = ค่าตั้งล่าสุดจากชีต (sysmenu ใช้)
   var DAY = 864e5, FACE_IC = ['bi-emoji-frown', 'bi-emoji-expressionless', 'bi-emoji-neutral', 'bi-emoji-smile', 'bi-emoji-heart-eyes'];
