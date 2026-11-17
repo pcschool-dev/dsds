@@ -3,7 +3,10 @@
  * https://pcschool-dev.github.io/dsds/survey.js
  *
  * ปกติไม่ต้องใส่เอง: sysmenu.js (1.6.0+) นับวันที่ผู้ใช้เปิดระบบไว้ในเครื่อง แล้วโหลดไฟล์นี้เมื่อถึงรอบ
- *   - ถามครั้งแรกเมื่อเปิดระบบนั้นมาแล้ว 3 วัน (ไม่นับวันซ้ำ) จากนั้นถามซ้ำทุก 60 วัน ; กด "ไว้ทีหลัง" = ถามใหม่ใน 7 วัน (ตั้งใหม่ได้ในหน้าแอดมิน)
+ *   - ถามครั้งแรกเมื่อเปิดระบบนั้นมาแล้ว 3 วัน (ไม่นับวันซ้ำ)
+ *   - 1.2.0 ถามให้น้อยลง: ตอบแล้ว = ไม่ถามระบบนั้นอีก 1 ปี (หรือแอดมินตั้งรอบใหม่ที่นานกว่า) ;
+ *     "ไว้ทีหลัง"/กากบาท = เว้นอย่างน้อย 30 วัน และครบ 2 ครั้งแล้วเลิกถามระบบนั้น 1 ปี ;
+ *     เครื่องเดียวกันถามได้ไม่เกิน 1 ระบบ ต่อ 30 วัน (ใช้หลายระบบก็ไม่โดนถามถี่) ; ไม่ถามในเบราว์เซอร์ในแอป LINE/FB/IG
  *   - ไม่ขึ้นทับหน้าต่างอื่นของระบบ และไม่ขึ้นก่อนผู้ใช้กดรับทราบการแจ้งข้อมูลส่วนบุคคล
  * ปิดในระบบหนึ่ง: <script src=".../sysmenu.js" data-survey="off"> ; เปิดเองจากโค้ด: DSDSSurvey.open('doc')
  *
@@ -25,7 +28,14 @@
   function ready() { return /^https:\/\/script\.google\.com\/.+\/exec$/.test(ENDPOINT); }
   function get(id) { try { return JSON.parse(localStorage.getItem(KEY + (id || '_')) || 'null') || {}; } catch (e) { return {}; } }
   function put(id, v) { try { localStorage.setItem(KEY + (id || '_'), JSON.stringify(v)); } catch (e) {} }
-  function due(id) { return ready() && (get(id).next || 0) <= Date.now(); }
+  var GAP = 30 * DAY, LATER_MIN = 30, LATER_MAX = 2, DONE_DAYS = 365;   // 1.2.0 ถามให้น้อยลง (ค่าขั้นต่ำ ไม่ว่าแอดมินจะตั้งเท่าไร)
+  var INAPP = /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|BytedanceWebview|musical_ly|TikTok|MicroMessenger|KAKAOTALK/i;
+  function lastAny() { try { return Number(localStorage.getItem(KEY + 'last')) || 0; } catch (e) { return 0; } }
+  function due(id) {
+    if (!ready() || INAPP.test(navigator.userAgent || '')) return false;
+    if (Date.now() - lastAny() < GAP) return false;   // เพิ่งถามระบบใดระบบหนึ่งในเครื่องนี้ไปแล้ว
+    return (get(id).next || 0) <= Date.now();
+  }
   function cid() {   // รหัสสุ่มประจำเครื่อง ใช้นับจำนวนคนตอบโดยไม่รู้ว่าเป็นใคร
     var k = KEY + 'cid', v = null; try { v = localStorage.getItem(k); } catch (e) {}
     if (!v) { v = (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).slice(0, 20); try { localStorage.setItem(k, v); } catch (e) {} }
@@ -123,7 +133,11 @@
     setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 250);
   }
   var CFG = { first: 3, repeat: 60, later: 7 };
-  function later(id) { put(id, { next: Date.now() + CFG.later * DAY }); remove(); }
+  function later(id) {
+    var n = (get(id).laters || 0) + 1;
+    put(id, { next: Date.now() + (n >= LATER_MAX ? DONE_DAYS : Math.max(LATER_MIN, CFG.later)) * DAY, laters: n });
+    remove();
+  }
 
   // ดึงชุดคำถาม (เบื้องหลัง) -> ได้แล้วค่อยขึ้นการ์ด ผู้ใช้ไม่ต้องรอ
   function open(id, role, force) {
@@ -177,12 +191,13 @@
       var k = t.getAttribute('data-dss');
       if (k === 'later') { later(id); return; }
       if (k === 'send' && !t.disabled) {
-        put(id, { next: Date.now() + CFG.repeat * DAY, last: Date.now() });
+        put(id, { next: Date.now() + Math.max(DONE_DAYS, CFG.repeat) * DAY, last: Date.now(), done: 1 });
         jsonp({ a: 's', sys: id, role: role || '-', cid: cid(), ans: JSON.stringify(ans) }, function () {});
         card.innerHTML = '<div class="dss-thanks"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>ขอบคุณครับ คำตอบของคุณช่วยให้ระบบดีขึ้น</div>';
         setTimeout(remove, 2200);
       }
     });
+    try { localStorage.setItem(KEY + 'last', String(Date.now())); } catch (e) {}   // นับว่าเครื่องนี้ถูกถามแล้ว (ทุกระบบรอ 30 วัน)
     (document.body || document.documentElement).appendChild(card);
     requestAnimationFrame(function () { requestAnimationFrame(function () { if (card) card.classList.add('is-in'); }); });
     watch = setInterval(function () { if (card) card.style.visibility = busy() ? 'hidden' : ''; }, 1500);
@@ -191,6 +206,6 @@
   window.DSDSSurvey = {
     open: function (id, role) { return open(id, role, true); },
     maybe: function (id, role) { return due(id) ? open(id, role) : false; },
-    due: due, ready: ready, version: '1.1.0'
+    due: due, ready: ready, version: '1.2.0'
   };
 })();
