@@ -15,7 +15,7 @@
  *   <button type="button" data-sysmenu aria-label="ระบบอื่นของโรงเรียน"><i class="bi bi-list"></i></button>
  * มีปุ่มแบบนี้ในหน้าแล้ว -> ไม่สร้างปุ่มลอย
  * เรียกจากโค้ด: DSDSMenu.open() / DSDSMenu.close()
- *   data-splash   "off" = ไม่แสดงหน้าสโลแกน DSDS ครั้งแรกของวัน
+ *   data-splash   "off" = ไม่แสดงหน้าสโลแกน DSDS ; ปกติแสดง 1 ครั้ง/7 วัน/เว็บ (data-splash-days="n" เปลี่ยนได้) ; ไม่แสดงในเบราว์เซอร์ของ LINE/FB/IG (1.6.1)
  *   หลังออกจากระบบ: จับปุ่ม "ออกจากระบบ"/logout ให้เอง (1.5.0) ; ปิดเฉพาะส่วนนี้ data-splash-logout="off" ; เรียกเองได้ DSDSMenu.splash()
  * กล่องเกี่ยวกับ/ติดต่องาน DSDS (about.js): ปุ่มท้ายแผงมีให้เอง ; เปิดจากโค้ด DSDSMenu.about() — แถวสถานะ LINE ต่อระบบ ดูหัว about.js
  * ความเป็นส่วนตัวและข้อมูล (privacy.js, 1.6.0): ปุ่มท้ายแผง + การ์ดแจ้งครั้งแรกต่อระบบ (ตามรหัส data-current) ; เปิดจากโค้ด DSDSMenu.privacy()
@@ -327,17 +327,23 @@
       document.head.appendChild(sc);
     }, 20000);   // ให้ผู้ใช้เริ่มงานก่อน ไม่ถามทันทีที่เปิด
   }
-  // หน้าสโลแกน DSDS: ครั้งแรกของวัน (เช็กวันในเครื่องก่อน ไม่โหลด about.js ถ้าเคยเห็นแล้ว) ; force = หลังออกจากระบบ
+  // หน้าสโลแกน DSDS: ครั้งแรกในรอบ 7 วัน (เช็กวันในเครื่องก่อน ไม่โหลด about.js ถ้าเคยเห็นแล้ว) ; force = หลังออกจากระบบ
   var SPLASH = opt('splash', '') !== 'off' && !(window.DSDS_ABOUT && window.DSDS_ABOUT.splash === false);
+  var SPLASH_DAYS = Math.max(1, Number(opt('splash-days', '')) || 7);
   function splash(force) {
     if (!SPLASH && !force) return;
     var p = null; try { p = sessionStorage.getItem('dsds.splash.pending'); } catch (e) {}
     if (p) force = true;   // หน้าก่อนในแท็บนี้โชว์ไม่ครบ (เช่น ออกจากระบบแล้วโหลดหน้า login ใหม่) -> โชว์ต่อที่หน้านี้
-    if (!force) { var d = new Date(), t = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(), s = null;
-      try { s = localStorage.getItem('dsds.splash.day'); } catch (e) {}
-      if (s === t) return; }
+    // เช็กความถี่ก่อน ไม่โหลด about.js ถ้ายังไม่ถึงรอบ (กติกาเดียวกับ about.js 1.1.0):
+    // ปกติ 1 ครั้ง/7 วัน/เว็บ (data-splash-days เปลี่ยนได้) ; หลังออกจากระบบไม่เกิน 1 ครั้ง/วัน ; เบราว์เซอร์ในแอป LINE/FB/IG/TikTok ไม่แสดง
+    if (!p) {
+      if (/\bLine\/|FBAN|FBAV|FB_IAB|Instagram|BytedanceWebview|musical_ly|TikTok|MicroMessenger|KAKAOTALK/i.test(navigator.userAgent || '')) { disarm(); return; }
+      var last = 0, d = new Date(), t = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+      try { last = Number(localStorage.getItem('dsds.splash.last')) || 0; if (!last && localStorage.getItem('dsds.splash.day') === t) last = Date.now(); } catch (e) {}
+      if (Date.now() - last < (force ? 0.8 : SPLASH_DAYS) * 864e5) { if (force) disarm(); return; }
+    }
     disarm();
-    withAbout(function (A) { A.splash({ force: !!force }); });
+    withAbout(function (A) { A.set({ splashDays: SPLASH_DAYS }); A.splash({ force: !!force }); });
   }
 
   // ===== สโลแกนหลังออกจากระบบ อัตโนมัติทุกระบบ (ไม่ต้องแก้โค้ดของระบบ) =====
@@ -547,7 +553,7 @@
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
     setAudience: function (v) { AUDIENCE = audOf(v); rerender(); },
     about: openAbout, privacy: openPrivacy, splash: function () { splash(true); },
-    get systems() { return DATA.systems.slice(); }, version: '1.6.0'
+    get systems() { return DATA.systems.slice(); }, version: '1.6.1'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

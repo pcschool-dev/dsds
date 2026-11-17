@@ -214,17 +214,30 @@
     requestAnimationFrame(function () { if (root) { root.classList.add('is-in'); root.querySelector('.dsa-close').focus({ preventScroll: true }); } });
   }
 
-  // ===== หน้าสโลแกน: ครั้งแรกของวัน (ต่อเว็บ) + หลังออกจากระบบ (ระบบเรียก splash({force:true})) แล้วเฟดหาย =====
+  // ===== หน้าสโลแกน: ครั้งแรกในรอบ 7 วัน (ต่อเว็บ) + หลังออกจากระบบ (ระบบเรียก splash({force:true})) แล้วเฟดหาย =====
   // PEND (sessionStorage): ยังโชว์ไม่ครบแต่หน้าเปลี่ยนไปก่อน (ออกจากระบบ -> หน้า login โหลดใหม่) -> หน้าถัดไปในแท็บเดิมโชว์ต่อ
   var DAY_KEY = 'dsds.splash.day', PEND = 'dsds.splash.pending', splashEl = null;
   function pend(v) { try { if (v) sessionStorage.setItem(PEND, '1'); else sessionStorage.removeItem(PEND); } catch (e) {} }
   function today() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  // ความถี่ (2026-11-17): ปกติ 1 ครั้ง/7 วัน/เว็บ ; หลังออกจากระบบ (force) ไม่เกิน 1 ครั้ง/วัน ; เบราว์เซอร์ในแอป (LINE/Facebook/IG/TikTok) ไม่แสดงเลย
+  // o.always = true แสดงแน่นอน (ใช้ทดสอบ) ; ตั้งจำนวนวันได้ DSDSAbout.set({splashDays: n})
+  var LAST_KEY = 'dsds.splash.last', DAY_MS = 864e5;
+  function inApp() { return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|BytedanceWebview|musical_ly|TikTok|MicroMessenger|KAKAOTALK/i.test(navigator.userAgent || ''); }
+  function lastShown() {
+    var t = 0; try { t = Number(localStorage.getItem(LAST_KEY)) || 0; if (!t && localStorage.getItem(DAY_KEY) === today()) t = Date.now(); } catch (e) {}
+    return t;
+  }
+  function due(force) {
+    if (inApp()) return false;
+    var gap = Date.now() - lastShown(), days = Number(cfg.splashDays) || 7;
+    return gap >= (force ? 0.8 : days) * DAY_MS;
+  }
   function splash(o) {
     o = o || {};
     if (splashEl || cfg.splash === false) return false;
-    var seen = null; try { seen = localStorage.getItem(DAY_KEY); } catch (e) {}
-    if (!o.force && seen === today()) return false;
-    try { localStorage.setItem(DAY_KEY, today()); } catch (e) {}
+    var pendNow = false; try { pendNow = !!sessionStorage.getItem(PEND); } catch (e) {}
+    if (!o.always && !pendNow && !due(!!o.force)) return false;
+    try { localStorage.setItem(LAST_KEY, String(Date.now())); localStorage.setItem(DAY_KEY, today()); } catch (e) {}
     pend(true);
     ensureStyle();
     var el = splashEl = document.createElement('div');
@@ -261,6 +274,6 @@
   window.DSDSAbout = {
     open: open, close: close, splash: splash,
     set: function (o) { if (o && typeof o === 'object') for (var k in o) cfg[k] = o[k]; },
-    version: '1.0.0'
+    version: '1.1.0'
   };
 })();
