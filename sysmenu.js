@@ -21,6 +21,7 @@
  * ความเป็นส่วนตัวและข้อมูล (privacy.js, 1.6.0): ปุ่มท้ายแผง + การ์ดแจ้งครั้งแรกต่อระบบ (ตามรหัส data-current) ; เปิดจากโค้ด DSDSMenu.privacy()
  *   data-privacy  "off" = ไม่แสดงการ์ดแจ้งครั้งแรก (ระบบที่มีหน้ายินยอมของตัวเองแล้ว) ปุ่มท้ายแผงยังอยู่
  * แบบประเมินการใช้งาน (survey.js, 1.6.0): นับวันที่เปิดระบบไว้ในเครื่อง ครบ 3 วันจึงถาม ถามซ้ำทุก 60 วัน (คำถาม/รอบ แก้ได้ในหน้าแอดมินแบบประเมิน) ; ปิด: data-survey="off"
+ *   1.7.0 ปุ่ม "ให้ดาวระบบนี้" ท้ายแผง เปิดแบบประเมินเองได้ทุกเมื่อ (data-survey="off" ซ่อนปุ่มด้วย) ; เรียกจากโค้ด DSDSMenu.survey()
  *
  *   data-audience "student" = ผู้ใช้เป็นนักเรียน -> เห็นเฉพาะระบบที่คอลัมน์ "ผู้ใช้" ในชีตเป็น นักเรียน หรือ ทุกคน (เว้นว่าง = ทุกคน)
  *                 (หรือเรียก DSDSMenu.setAudience('student') หลังล็อกอิน; 'teacher' หรือไม่ระบุ = เห็นครบ) — แค่จัดเมนู ไม่ใช่การกันสิทธิ์
@@ -153,6 +154,7 @@
     '.dsm-about:hover, .dsm-about:focus-visible { background: #eff6ff; border-color: #bfdbfe; outline: none; }',
     '.dsm-about .bi-line { color: #06c755; font-size: 1.05rem; }',
     '.dsm-about .bi-shield-check { color: #8a2432; font-size: 1rem; }',
+    '.dsm-about .bi-star-fill { color: #e3a008; font-size: 1rem; }',
     '.dsm-fab { position: fixed; z-index: 2147482000; width: 42px; height: 42px; padding: 0; margin: 0; border-radius: 13px; cursor: pointer;',
     '  border: 1.5px solid rgba(255,255,255,.9); background: var(--dsm-grad); color: #fff; font-size: 1.4rem; line-height: 1;',
     '  display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(15,23,42,.25); transition: transform .12s, box-shadow .15s; }',
@@ -262,7 +264,8 @@
   // ปุ่มกล่อง "เกี่ยวกับ/ติดต่องาน DSDS" (about.js โหลดตอนกดครั้งแรก) — ทุกระบบได้กล่องเดียวกันโดยไม่ต้องแก้ระบบ
   function footHtml() {
     return '<button type="button" class="dsm-about" data-dsds-about-load><i class="bi bi-line" aria-hidden="true"></i>ติดต่อทีมงาน DSDS · ขอความช่วยเหลือ</button>' +
-      '<button type="button" class="dsm-about" data-dsds-privacy-load><i class="bi bi-shield-check" aria-hidden="true"></i>ความเป็นส่วนตัวและข้อมูล</button>' + (ADMIN ? '<a class="dsm-admin" href="' + SHEET_EDIT + '" target="_blank" rel="noopener"><i class="bi bi-pencil-square"></i>จัดการรายการระบบ (Google Sheet)</a>'
+      '<button type="button" class="dsm-about" data-dsds-privacy-load><i class="bi bi-shield-check" aria-hidden="true"></i>ความเป็นส่วนตัวและข้อมูล</button>' +
+      (opt('survey', '') === 'off' ? '' : '<button type="button" class="dsm-about" data-dsds-survey-load><i class="bi bi-star-fill" aria-hidden="true"></i>ให้ดาวระบบนี้ · ความพึงพอใจ</button>') + (ADMIN ? '<a class="dsm-admin" href="' + SHEET_EDIT + '" target="_blank" rel="noopener"><i class="bi bi-pencil-square"></i>จัดการรายการระบบ (Google Sheet)</a>'
                  : 'ลิงก์ทุกระบบเปิดในแท็บใหม่');
   }
   var ABOUT_SRC = (me && me.src ? me.src.replace(/sysmenu\.js(\?.*)?$/, 'about.js') : '') || 'https://pcschool-dev.github.io/dsds/about.js';
@@ -326,6 +329,14 @@
       sc.onload = function () { if (window.DSDSSurvey) window.DSDSSurvey.maybe(id, AUDIENCE); };
       document.head.appendChild(sc);
     }, 20000);   // ให้ผู้ใช้เริ่มงานก่อน ไม่ถามทันทีที่เปิด
+  }
+  // 1.7.0 ปุ่ม "ให้ดาวระบบนี้" ท้ายแผง: เปิดแบบประเมินเองได้ทุกเมื่อ (ไม่ต้องรอรอบ)
+  function openSurvey() {
+    var id = CURRENT || '_';
+    function go() { if (window.DSDSSurvey) window.DSDSSurvey.open(id, AUDIENCE); }
+    if (window.DSDSSurvey) { go(); return; }
+    var sc = document.createElement('script'); sc.src = SURVEY_SRC + '?v=' + Math.floor(Date.now() / 36e5);
+    sc.onload = go; document.head.appendChild(sc);
   }
   // หน้าสโลแกน DSDS: ครั้งแรกในรอบ 7 วัน (เช็กวันในเครื่องก่อน ไม่โหลด about.js ถ้าเคยเห็นแล้ว) ; force = หลังออกจากระบบ
   var SPLASH = opt('splash', '') !== 'off' && !(window.DSDS_ABOUT && window.DSDS_ABOUT.splash === false);
@@ -524,6 +535,7 @@
     if (b) { e.preventDefault(); open(b); return; }
     if (t.closest('[data-dsds-about-load]')) { e.preventDefault(); close(); openAbout(); return; }
     if (t.closest('[data-dsds-privacy-load]')) { e.preventDefault(); close(); openPrivacy(); return; }
+    if (t.closest('[data-dsds-survey-load]')) { e.preventDefault(); close(); openSurvey(); return; }
     if (t.closest('[data-dsm-close]')) { e.preventDefault(); close(); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
@@ -551,9 +563,10 @@
   window.DSDSMenu = {
     open: function () { open(); }, close: close, refresh: function () { refresh(true); },
     setAdmin: function (v) { ADMIN = !!v; rerender(); },
+    survey: openSurvey,
     setAudience: function (v) { AUDIENCE = audOf(v); rerender(); },
     about: openAbout, privacy: openPrivacy, splash: function () { splash(true); },
-    get systems() { return DATA.systems.slice(); }, version: '1.6.1'
+    get systems() { return DATA.systems.slice(); }, version: '1.7.0'
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
