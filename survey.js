@@ -8,6 +8,7 @@
  *     "ไว้ทีหลัง"/กากบาท = เว้นอย่างน้อย 30 วัน และครบ 2 ครั้งแล้วเลิกถามระบบนั้น 1 ปี ;
  *     เครื่องเดียวกันถามได้ไม่เกิน 1 ระบบ ต่อ 30 วัน (ใช้หลายระบบก็ไม่โดนถามถี่) ; ไม่ถามในเบราว์เซอร์ในแอป LINE/FB/IG
  *   - ไม่ขึ้นทับหน้าต่างอื่นของระบบ และไม่ขึ้นก่อนผู้ใช้กดรับทราบการแจ้งข้อมูลส่วนบุคคล
+ *   - 1.3.0 คำถามแบบคะแนน (scale) แสดงเป็นดาว 1–5 (คลัง UI แบบ 05) แทนหน้ายิ้ม ค่าที่ส่งเหมือนเดิม ; เปิดเองได้จากปุ่ม "ให้ดาวระบบนี้" ในเมนู ☰ (sysmenu 1.7.0)
  * ปิดในระบบหนึ่ง: <script src=".../sysmenu.js" data-survey="off"> ; เปิดเองจากโค้ด: DSDSSurvey.open('doc')
  *
  * คำถามและคำตอบอยู่ที่ Apps Script "ระบบประเมินการใช้งาน DSDS" (ENDPOINT) + ชีตของโรงเรียน ไม่ใช้ฐานข้อมูลของระบบใด
@@ -76,6 +77,15 @@
     '.dss-face i { font-size: 1.45rem; line-height: 1; }',
     '.dss-face:hover, .dss-face:focus-visible { border-color: #e6b3bc; outline: none; }',
     '.dss-face.is-on { border-color: ' + BRAND + '; background: #fbeef0; color: ' + BRAND + '; font-weight: 700; }',
+    '.dss-stars { display: flex; align-items: center; gap: 4px; }',
+    '.dss-star { border: 0; background: none; padding: 2px; margin: 0; cursor: pointer; font-size: 34px; line-height: 1; color: #d6dbe3; transition: transform .15s, color .15s; }',
+    '@media (hover: hover) { .dss-star:hover { transform: scale(1.2); } }',
+    '.dss-star:focus-visible { outline: 2px solid #e6b3bc; outline-offset: 2px; border-radius: 6px; }',
+    '.dss-star.is-lit { color: #e3a008; }',
+    '.dss-star.is-pop { animation: dss-pop .3s; }',
+    '@keyframes dss-pop { 50% { transform: scale(1.35); } }',
+    '.dss-starl { font-size: .82rem; color: #64748b; min-height: 1.3em; margin: 2px 0 2px 4px; }',
+    '.dss-starl b { color: #b7791f; }',
     '.dss-opts { display: flex; flex-wrap: wrap; gap: 6px; }',
     '.dss-opt { min-height: 38px; padding: 0 14px; border: 1px solid #e2e8f0; border-radius: 999px; background: #fff; color: #0f172a; font: inherit; font-size: .85rem; cursor: pointer; }',
     '.dss-opt:hover, .dss-opt:focus-visible { border-color: #e6b3bc; outline: none; }',
@@ -87,13 +97,17 @@
     '.dss-btn[disabled] { opacity: .45; cursor: default; }',
     '.dss-thanks { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: .95rem; }',
     '.dss-thanks i { color: #16a34a; font-size: 1.3rem; }',
-    '@media (prefers-reduced-motion: reduce) { .dss-card { transition: none; } }',
+    '@media (prefers-reduced-motion: reduce) { .dss-card, .dss-star { transition: none; } .dss-star.is-pop { animation: none; } }',
     '@media print { .dss-card { display: none !important; } }',
     dk('.dss-card', 'background: #161b24; color: #e8effc; border-color: #282f3a; box-shadow: 0 24px 60px rgba(0,0,0,.55);'),
     dk('.dss-k', 'color: #9aa6b8;'),
     dk('.dss-face, .dss-opt, .dss-btn, .dss-note', 'background: #1b212b; border-color: #2d3948; color: #e8effc;'),
     dk('.dss-face.is-on, .dss-opt.is-on', 'background: #3a1d24; border-color: #e58a9b; color: #f0a3b0;'),
     dk('.dss-btn.is-main', 'background: #a3384a; border-color: #a3384a; color: #fff;'),
+    dk('.dss-star', 'color: #3a4352;'),
+    dk('.dss-star.is-lit', 'color: #f5b82e;'),
+    dk('.dss-starl', 'color: #9aa6b8;'),
+    dk('.dss-starl b', 'color: #f5b82e;'),
     dk('.dss-x:hover', 'background: #202631; color: #e8effc;')
   ].join('\n');
   function ensureStyle() {
@@ -154,7 +168,9 @@
     var h = '<div class="dss-qb" data-q="' + i + '"><div class="dss-q">' + esc(q.text) + (q.req ? '' : ' <span class="dss-opt-l">(ไม่บังคับ)</span>') + '</div>';
     if (q.type === 'scale') {
       var lb = q.opts && q.opts.length === 5 ? q.opts : ['แย่', 'พอใช้', 'ปานกลาง', 'ดี', 'ดีมาก'];
-      h += '<div class="dss-faces">' + lb.map(function (l, k) { return '<button type="button" class="dss-face" data-v="' + (k + 1) + '" aria-pressed="false"><i class="bi ' + FACE_IC[k] + '" aria-hidden="true"></i>' + esc(l) + '</button>'; }).join('') + '</div>';
+      // 1.3.0 ให้ดาว (คลัง UI แบบ 05): 1–5 ดาว ชี้แล้วเห็นคำอธิบาย ค่าที่ส่งยังเป็น 1–5 เหมือนเดิม
+      h += '<div class="dss-stars" role="radiogroup" aria-label="' + esc(q.text) + '" data-lb="' + esc(JSON.stringify(lb)) + '">' + lb.map(function (l, k) { return '<button type="button" class="dss-star" data-v="' + (k + 1) + '" role="radio" aria-checked="false" aria-label="' + (k + 1) + ' ดาว ' + esc(l) + '">★</button>'; }).join('') + '</div>' +
+        '<div class="dss-starl">แตะดาวเพื่อให้คะแนน</div>';
     } else if (q.type === 'choice') {
       h += '<div class="dss-opts">' + (q.opts || []).map(function (o) { return '<button type="button" class="dss-opt" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + '</button>'; }).join('') + '</div>';
     } else {
@@ -173,9 +189,18 @@
       '<div class="dss-body">' + qs.map(qHtml).join('') + '</div>' +
       '<div class="dss-act"><button type="button" class="dss-btn" data-dss="later">ไว้ทีหลัง</button>' +
       '<button type="button" class="dss-btn is-main" data-dss="send" disabled>ส่ง</button></div>';
+    function paint(b, hv) {   // ระบายดาว: hv = ดาวที่ชี้อยู่ (0 = แสดงค่าที่เลือก)
+      var q = qs[+b.getAttribute('data-q')], v = +ans[q.id] || 0, n = hv || v, w = b.querySelector('.dss-stars'), lb = [];
+      try { lb = JSON.parse(w.getAttribute('data-lb')); } catch (e) {}
+      w.querySelectorAll('.dss-star').forEach(function (x, i) { x.classList.toggle('is-lit', i < n); x.setAttribute('aria-checked', i + 1 === v); });
+      b.querySelector('.dss-starl').innerHTML = n ? '<b>' + '★'.repeat(n) + '</b> ' + esc(lb[n - 1] || '') + (hv ? '' : ' (' + v + '/5)') : 'แตะดาวเพื่อให้คะแนน';
+    }
+    card.addEventListener('mouseover', function (e) { var x = e.target.closest && e.target.closest('.dss-star'); if (x) paint(x.closest('.dss-qb'), +x.getAttribute('data-v')); });
+    card.addEventListener('mouseout', function (e) { var w = e.target.closest && e.target.closest('.dss-stars'); if (w && !w.contains(e.relatedTarget)) paint(w.closest('.dss-qb'), 0); });
     function sync() {
       card.querySelectorAll('.dss-qb').forEach(function (b) {
         var q = qs[+b.getAttribute('data-q')];
+        if (b.querySelector('.dss-stars')) { paint(b, 0); return; }
         b.querySelectorAll('[data-v]').forEach(function (x) { var on = String(ans[q.id]) === x.getAttribute('data-v'); x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on); });
       });
       card.querySelector('[data-dss="send"]').disabled = !qs.every(function (q) { return !q.req || (ans[q.id] != null && String(ans[q.id]).trim() !== ''); });
@@ -187,7 +212,9 @@
     card.addEventListener('click', function (e) {
       var t = e.target.closest && e.target.closest('button'); if (!t || !card) return;
       var b = t.closest('.dss-qb');
-      if (b && t.hasAttribute('data-v')) { var q = qs[+b.getAttribute('data-q')]; ans[q.id] = q.type === 'scale' ? +t.getAttribute('data-v') : t.getAttribute('data-v'); sync(); return; }
+      if (b && t.hasAttribute('data-v')) { var q = qs[+b.getAttribute('data-q')]; ans[q.id] = q.type === 'scale' ? +t.getAttribute('data-v') : t.getAttribute('data-v'); sync();
+        if (t.classList.contains('dss-star')) { t.classList.remove('is-pop'); void t.offsetWidth; t.classList.add('is-pop'); }
+        return; }
       var k = t.getAttribute('data-dss');
       if (k === 'later') { later(id); return; }
       if (k === 'send' && !t.disabled) {
@@ -206,6 +233,6 @@
   window.DSDSSurvey = {
     open: function (id, role) { return open(id, role, true); },
     maybe: function (id, role) { return due(id) ? open(id, role) : false; },
-    due: due, ready: ready, version: '1.2.0'
+    due: due, ready: ready, version: '1.3.0'
   };
 })();
